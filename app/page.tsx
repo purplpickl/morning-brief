@@ -28,6 +28,19 @@ function formatDate(): string {
   })
 }
 
+function ColHead({ title }: { title: string }) {
+  return (
+    <div
+      className="flex items-center border-t border-b py-[5px] mb-4"
+      style={{ borderColor: 'rgba(236,228,211,0.35)' }}
+    >
+      <h3 className="font-body-serif text-[20px] font-bold uppercase tracking-[0.08em] text-ink m-0">
+        {title}
+      </h3>
+    </div>
+  )
+}
+
 function SectionHead({ title, meta }: { title: string; meta?: string }) {
   return (
     <div className="section-head">
@@ -115,7 +128,7 @@ export default async function Home() {
             className="py-5 md:pr-6 border-b md:border-b-0 md:border-r"
             style={{ borderColor: 'rgba(236,228,211,0.35)' }}
           >
-            <p className="col-label">Weather</p>
+            <ColHead title="Weather" />
             <WeatherSection />
           </div>
 
@@ -124,13 +137,13 @@ export default async function Home() {
             className="py-5 md:px-6 border-b md:border-b-0 md:border-r"
             style={{ borderColor: 'rgba(236,228,211,0.35)' }}
           >
-            <p className="col-label">Today&apos;s Schedule</p>
+            <ColHead title="Today's Schedule" />
             <CalendarSection events={calEvents} />
           </div>
 
           {/* Quick Links */}
           <div className="py-5 md:pl-6">
-            <p className="col-label">Quick Access</p>
+            <ColHead title="Quick Access" />
             <QuickLinks />
           </div>
         </div>

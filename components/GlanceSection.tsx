@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { CalEvent } from '@/lib/gcal'
 import { StockQuote } from '@/lib/stocks'
 
@@ -27,99 +26,71 @@ export default function GlanceSection({
   calEvents: CalEvent[]
   stocks: StockQuote[]
 }) {
-  const [highTemp, setHighTemp] = useState<number | null>(null)
-
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition(async pos => {
-      try {
-        const { latitude, longitude } = pos.coords
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max&temperature_unit=fahrenheit&timezone=auto&forecast_days=1`
-        const res = await fetch(url)
-        const data = await res.json()
-        setHighTemp(Math.round(data.daily?.temperature_2m_max?.[0] ?? null))
-      } catch { /* skip */ }
-    })
-  }, [])
-
   const timedEvents = calEvents.filter(e => !e.allDay)
   const firstEvent = timedEvents[0]
   const sp500 = stocks.find(s => s.symbol === 'S&P 500')
-
-  const summaryParts: string[] = []
-  if (highTemp !== null) summaryParts.push(`Today's high is ${highTemp}°`)
-  if (timedEvents.length > 0) {
-    summaryParts.push(
-      `${timedEvents.length} event${timedEvents.length > 1 ? 's' : ''} on the calendar`
-    )
-  } else if (calEvents.length === 0) {
-    summaryParts.push('Nothing on the calendar today')
-  }
+  const sp500Up = (sp500?.change ?? 0) >= 0
 
   return (
     <div
-      className="grid grid-cols-1 md:grid-cols-2 gap-6 py-6"
+      className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-6"
       style={{ borderBottom: '1px solid rgba(236,228,211,0.35)' }}
     >
       {/* Left — greeting */}
-      <div>
+      <div className="py-6 md:border-r" style={{ borderColor: 'rgba(236,228,211,0.35)' }}>
         <h2
-          className="font-editorial font-bold text-ink leading-tight mb-3"
-          style={{ fontSize: 'clamp(28px, 4vw, 42px)' }}
+          className="font-editorial font-bold text-ink leading-tight"
+          style={{ fontSize: 'clamp(30px, 4vw, 44px)' }}
         >
           {greeting()}, Jacob.
         </h2>
-        {summaryParts.length > 0 && (
-          <p className="font-body-serif text-base text-muted leading-relaxed">
-            {summaryParts.join('. ')}.
+        {timedEvents.length > 0 && (
+          <p className="font-body-serif text-base text-muted leading-relaxed mt-2">
+            {timedEvents.length} event{timedEvents.length > 1 ? 's' : ''} on the calendar
+            {firstEvent ? `, starting at ${fmtTime(firstEvent.start)}` : ''}.
           </p>
         )}
       </div>
 
-      {/* Right — at a glance */}
-      <div
-        className="md:border-l md:pl-6"
-        style={{ borderColor: 'rgba(236,228,211,0.35)' }}
-      >
-        <p className="col-label mb-3">Today, at a glance</p>
-        <div className="space-y-0">
+      {/* Right — stats */}
+      <div className="pb-6 md:py-6 md:pl-6">
+        {/* Section head */}
+        <div
+          className="flex items-center justify-between border-t border-b py-[5px] mb-4"
+          style={{ borderColor: 'rgba(236,228,211,0.35)' }}
+        >
+          <h3 className="font-body-serif text-[20px] font-bold uppercase tracking-[0.08em] text-ink m-0">
+            At a Glance
+          </h3>
+        </div>
 
+        <div>
           {/* Calendar */}
-          <div className="flex items-baseline gap-3 py-2.5" style={{ borderBottom: '1px dotted rgba(236,228,211,0.25)' }}>
-            <span className="font-editorial text-2xl font-bold text-ink w-7 shrink-0 tabular-nums">
-              {calEvents.filter(e => !e.allDay).length || '—'}
+          <div className="flex items-center gap-4 py-2.5" style={{ borderBottom: '1px dotted rgba(236,228,211,0.25)' }}>
+            <span className="font-editorial text-3xl font-bold text-ink tabular-nums leading-none" style={{ minWidth: '2rem' }}>
+              {timedEvents.length || '—'}
             </span>
             <span className="font-body-serif text-sm text-muted">
               {timedEvents.length > 0
                 ? `event${timedEvents.length > 1 ? 's' : ''} · first at ${fmtTime(firstEvent.start)}`
-                : 'no events today'}
+                : 'nothing on the calendar'}
             </span>
           </div>
 
-          {/* Markets */}
+          {/* S&P 500 */}
           {sp500 && (
-            <div className="flex items-baseline gap-3 py-2.5" style={{ borderBottom: '1px dotted rgba(236,228,211,0.25)' }}>
+            <div className="flex items-center gap-4 py-2.5">
               <span
-                className="font-editorial text-2xl font-bold w-7 shrink-0 tabular-nums"
-                style={{ color: sp500.change >= 0 ? '#7fd39e' : '#e07a7a', fontSize: '18px' }}
+                className="font-editorial text-2xl font-bold tabular-nums leading-none"
+                style={{ color: sp500Up ? '#7fd39e' : '#e07a7a', minWidth: '2rem' }}
               >
-                {sp500.change >= 0 ? '+' : ''}{sp500.changePercent.toFixed(1)}%
+                {sp500Up ? '+' : ''}{sp500.changePercent.toFixed(1)}%
               </span>
               <span className="font-body-serif text-sm text-muted">
-                S&amp;P 500 · {sp500.change >= 0 ? 'up' : 'down'} today
+                S&amp;P 500 · {sp500Up ? 'up' : 'down'} today
               </span>
             </div>
           )}
-
-          {/* Weather high */}
-          {highTemp !== null && (
-            <div className="flex items-baseline gap-3 py-2.5">
-              <span className="font-editorial text-2xl font-bold text-ink w-7 shrink-0 tabular-nums" style={{ fontSize: '18px' }}>
-                {highTemp}°
-              </span>
-              <span className="font-body-serif text-sm text-muted">high today</span>
-            </div>
-          )}
-
         </div>
       </div>
     </div>
