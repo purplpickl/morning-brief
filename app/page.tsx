@@ -70,14 +70,12 @@ export default async function Home() {
         </CollapsibleSection>
 
         {hasSports && (
-          <CollapsibleSection title="Sports" badge={sportsData.length || undefined}>
-            {scoresData.length > 0 && (
-              <div className="mb-4">
-                <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Yesterday&apos;s Scores</p>
-                <ScoresSection games={scoresData} />
-                {sportsData.length > 0 && <div className="border-t border-gray-800 mt-4" />}
-              </div>
-            )}
+          <CollapsibleSection title="Sports" badge={scoresData.length + sportsData.length || undefined}>
+            <div className="mb-4">
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Yesterday&apos;s Scores</p>
+              <ScoresSection games={scoresData} />
+              {sportsData.length > 0 && <div className="border-t border-gray-800 mt-4" />}
+            </div>
             {sportsData.length > 0 && <SportsSection items={sportsData} />}
           </CollapsibleSection>
         )}

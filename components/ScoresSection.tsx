@@ -1,14 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { GameScore } from '@/lib/scores'
 import { GameDetail } from '@/app/api/game/route'
 
 const LEAGUE_ORDER = ['NBA', 'NHL', 'MLB', 'NFL', 'NCAAM', 'NCAAW']
+const DISMISS_THRESHOLD = 100 // px
 
 function GameSheet({ game, onClose }: { game: GameScore; onClose: () => void }) {
   const [detail, setDetail] = useState<GameDetail | null>(null)
   const [loading, setLoading] = useState(true)
+  const [dragY, setDragY] = useState(0)
+  const [dragging, setDragging] = useState(false)
+  const startY = useRef(0)
 
   useEffect(() => {
     if (!game.gameId) { setLoading(false); return }
@@ -18,28 +22,64 @@ function GameSheet({ game, onClose }: { game: GameScore; onClose: () => void }) 
       .catch(() => setLoading(false))
   }, [game.gameId, game.league])
 
-  // Lock body scroll while sheet is open
   useEffect(() => {
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = '' }
   }, [])
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    startY.current = e.touches[0].clientY
+    setDragging(true)
+  }, [])
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!dragging) return
+    const delta = e.touches[0].clientY - startY.current
+    if (delta > 0) setDragY(delta)
+  }, [dragging])
+
+  const handleTouchEnd = useCallback(() => {
+    setDragging(false)
+    if (dragY > DISMISS_THRESHOLD) {
+      onClose()
+    } else {
+      setDragY(0)
+    }
+  }, [dragY, onClose])
 
   const awayWon = game.awayScore > game.homeScore
   const homeWon = game.homeScore > game.awayScore
 
   return (
     <div className="fixed inset-0 z-50 flex items-end" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       <div
-        className="relative w-full bg-gray-950 border-t border-gray-800 rounded-t-2xl px-5 pt-4 pb-8 max-h-[82vh] overflow-y-auto animate-slide-up"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        style={{ opacity: Math.max(0, 1 - dragY / 300) }}
+      />
+      <div
+        className="relative w-full bg-gray-950 border-t border-gray-800 rounded-t-2xl px-5 pt-4 pb-10 max-h-[82vh] overflow-y-auto animate-slide-up"
+        style={{
+          transform: `translateY(${dragY}px)`,
+          transition: dragging ? 'none' : 'transform 0.2s ease',
+        }}
         onClick={e => e.stopPropagation()}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         {/* Drag handle */}
         <div className="w-10 h-1 bg-gray-700 rounded-full mx-auto mb-4" />
 
         {/* Header */}
         <div className="flex justify-between items-center mb-5">
-          <span className="text-xs text-gray-500 uppercase tracking-wider">{game.league}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500 uppercase tracking-wider">{game.league}</span>
+            {game.playoffNote && (
+              <span className="text-xs bg-blue-900 text-blue-300 px-2 py-0.5 rounded-full font-medium">
+                {game.playoffNote}
+              </span>
+            )}
+          </div>
           <button onClick={onClose} className="text-gray-500 hover:text-white p-1 -mr-1">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -48,7 +88,7 @@ function GameSheet({ game, onClose }: { game: GameScore; onClose: () => void }) 
         </div>
 
         {/* Big score */}
-        <div className="space-y-3 mb-5">
+        <div className="space-y-3 mb-4">
           <div className="flex items-center justify-between">
             <div>
               <p className={`text-xl font-bold ${awayWon ? 'text-white' : 'text-gray-500'}`}>{game.away}</p>
@@ -159,7 +199,9 @@ function GameCard({ game, onClick }: { game: GameScore; onClick: () => void }) {
         <span className={`tabular-nums font-bold ${homeWon ? 'text-white' : 'text-gray-400'}`}>{game.homeScore}</span>
       </div>
       <p className="text-gray-600 text-xs mt-1.5">
-        {game.status}{isHighlight ? ` · ${game.highlight}` : ''}
+        {game.status}
+        {isHighlight ? ` · ${game.highlight}` : ''}
+        {game.playoffNote ? ` · ${game.playoffNote}` : ''}
       </p>
     </button>
   )
@@ -168,7 +210,11 @@ function GameCard({ game, onClick }: { game: GameScore; onClick: () => void }) {
 export default function ScoresSection({ games }: { games: GameScore[] }) {
   const [selected, setSelected] = useState<GameScore | null>(null)
 
-  if (games.length === 0) return null
+  if (games.length === 0) {
+    return (
+      <p className="text-gray-600 text-sm">No games yesterday.</p>
+    )
+  }
 
   const byLeague = LEAGUE_ORDER.map(league => ({
     league,
