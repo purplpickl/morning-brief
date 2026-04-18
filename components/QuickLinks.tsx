@@ -1,12 +1,14 @@
 'use client'
 
+import Image from 'next/image'
+
 const LINKS = [
-  { label: 'Todoist', appUrl: 'todoist://', webUrl: 'https://todoist.com/app', emoji: '✅' },
-  { label: 'Gmail', appUrl: 'googlegmail://', webUrl: 'https://mail.google.com', emoji: '📧' },
-  { label: 'LinkedIn', appUrl: 'linkedin://', webUrl: 'https://www.linkedin.com/feed/', emoji: '💼' },
-  { label: 'Substack', appUrl: 'substack://', webUrl: 'https://substack.com/home', emoji: '📰' },
-  { label: 'Happy Scale', appUrl: 'happyscale://', webUrl: 'https://happyscale.com', emoji: '⚖️' },
-  { label: 'Copilot', appUrl: 'copilot://', webUrl: 'https://copilot.money', emoji: '💰' },
+  { label: 'Todoist', appUrl: 'todoist://', webUrl: 'https://todoist.com/app', icon: 'https://www.google.com/s2/favicons?domain=todoist.com&sz=128' },
+  { label: 'Gmail', appUrl: 'googlegmail://', webUrl: 'https://mail.google.com', icon: 'https://www.google.com/s2/favicons?domain=mail.google.com&sz=128' },
+  { label: 'LinkedIn', appUrl: 'linkedin://', webUrl: 'https://www.linkedin.com/feed/', icon: 'https://www.google.com/s2/favicons?domain=linkedin.com&sz=128' },
+  { label: 'Substack', appUrl: 'substack://', webUrl: 'https://substack.com/home', icon: 'https://www.google.com/s2/favicons?domain=substack.com&sz=128' },
+  { label: 'Happy Scale', appUrl: 'happyscale://', webUrl: 'https://happyscale.com', icon: 'https://www.google.com/s2/favicons?domain=happyscale.com&sz=128' },
+  { label: 'Copilot', appUrl: 'copilot://', webUrl: 'https://copilot.money', icon: 'https://www.google.com/s2/favicons?domain=copilot.money&sz=128' },
 ]
 
 function openApp(appUrl: string, webUrl: string) {
@@ -29,9 +31,16 @@ export default function QuickLinks() {
           <button
             key={link.label}
             onClick={() => openApp(link.appUrl, link.webUrl)}
-            className="flex-1 bg-gray-900 rounded-xl py-3 flex flex-col items-center gap-1 hover:bg-gray-800 transition-colors cursor-pointer"
+            className="bg-gray-900 rounded-xl py-4 flex flex-col items-center gap-2 hover:bg-gray-800 transition-colors cursor-pointer"
           >
-            <span className="text-2xl">{link.emoji}</span>
+            <Image
+              src={link.icon}
+              alt={link.label}
+              width={40}
+              height={40}
+              className="rounded-xl"
+              unoptimized
+            />
             <span className="text-xs text-gray-300 font-medium">{link.label}</span>
           </button>
         ))}
