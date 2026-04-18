@@ -21,7 +21,7 @@ export default function ScoresSection({ games }: { games: GameScore[] }) {
         {byLeague.map(({ league, games }) => (
           <div key={league}>
             <p className="text-xs text-gray-500 mb-2">{league}</p>
-            <div className="space-y-1.5">
+            <div className="grid grid-cols-2 gap-2">
               {games.map((game, i) => {
                 const awayWon = game.awayScore > game.homeScore
                 const homeWon = game.homeScore > game.awayScore
@@ -30,37 +30,19 @@ export default function ScoresSection({ games }: { games: GameScore[] }) {
                 return (
                   <div
                     key={i}
-                    className={`flex items-center justify-between px-4 py-2.5 rounded-xl text-sm ${
+                    className={`px-3 py-2 rounded-xl text-xs ${
                       isHighlight ? 'bg-blue-950 border border-blue-800' : 'bg-gray-900'
                     }`}
                   >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-4">
-                        {/* Away */}
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className={`font-medium truncate ${awayWon ? 'text-white' : 'text-gray-400'}`}>
-                            {game.away}
-                          </span>
-                          <span className={`font-bold tabular-nums ${awayWon ? 'text-white' : 'text-gray-400'}`}>
-                            {game.awayScore}
-                          </span>
-                        </div>
-                        <span className="text-gray-600 text-xs shrink-0">@</span>
-                        {/* Home */}
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className={`font-bold tabular-nums ${homeWon ? 'text-white' : 'text-gray-400'}`}>
-                            {game.homeScore}
-                          </span>
-                          <span className={`font-medium truncate ${homeWon ? 'text-white' : 'text-gray-400'}`}>
-                            {game.home}
-                          </span>
-                        </div>
-                      </div>
-                      <p className="text-gray-500 text-xs mt-0.5">{game.status}</p>
+                    <div className="flex justify-between items-center">
+                      <span className={awayWon ? 'text-white font-semibold' : 'text-gray-400'}>{game.away}</span>
+                      <span className={awayWon ? 'text-white font-bold tabular-nums' : 'text-gray-400 tabular-nums'}>{game.awayScore}</span>
                     </div>
-                    {isHighlight && (
-                      <span className="ml-3 text-xs text-blue-400 font-medium shrink-0">{game.highlight}</span>
-                    )}
+                    <div className="flex justify-between items-center mt-0.5">
+                      <span className={homeWon ? 'text-white font-semibold' : 'text-gray-400'}>{game.home}</span>
+                      <span className={homeWon ? 'text-white font-bold tabular-nums' : 'text-gray-400 tabular-nums'}>{game.homeScore}</span>
+                    </div>
+                    <p className="text-gray-600 text-xs mt-1">{game.status}{isHighlight ? ` · ${game.highlight}` : ''}</p>
                   </div>
                 )
               })}
