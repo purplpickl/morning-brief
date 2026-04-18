@@ -106,6 +106,8 @@ export default async function Home() {
             </span>
           </div>
 
+          <div style={{ borderTop: '1px solid rgba(236,228,211,0.35)', marginBottom: '16px' }} />
+
           {/* Title */}
           <h1
             className="font-masthead leading-none tracking-tight"
