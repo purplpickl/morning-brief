@@ -12,6 +12,7 @@ import SportsSection from '@/components/SportsSection'
 import GmailSection from '@/components/GmailSection'
 import QuickLinks from '@/components/QuickLinks'
 import WeatherSection from '@/components/WeatherSection'
+import LocationLabel from '@/components/LocationLabel'
 import ScoresSection from '@/components/ScoresSection'
 import CalendarSection from '@/components/CalendarSection'
 
@@ -100,7 +101,7 @@ export default async function Home() {
               {formatDate()}
             </span>
             <span className="font-label text-[11px] tracking-[0.14em] uppercase text-muted">
-              Raleigh, NC
+              <LocationLabel />
             </span>
           </div>
 
