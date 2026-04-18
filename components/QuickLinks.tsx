@@ -3,12 +3,12 @@
 import Image from 'next/image'
 
 const LINKS = [
-  { label: 'Todoist', appUrl: 'todoist://', webUrl: 'https://todoist.com/app', icon: 'https://www.google.com/s2/favicons?domain=todoist.com&sz=128' },
-  { label: 'Gmail', appUrl: 'googlegmail://', webUrl: 'https://mail.google.com', icon: 'https://www.google.com/s2/favicons?domain=mail.google.com&sz=128' },
-  { label: 'LinkedIn', appUrl: 'linkedin://', webUrl: 'https://www.linkedin.com/feed/', icon: 'https://www.google.com/s2/favicons?domain=linkedin.com&sz=128' },
-  { label: 'Substack', appUrl: 'substack://', webUrl: 'https://substack.com/home', icon: 'https://www.google.com/s2/favicons?domain=substack.com&sz=128' },
-  { label: 'Happy Scale', appUrl: 'happyscale://', webUrl: 'https://happyscale.com', icon: 'https://www.google.com/s2/favicons?domain=happyscale.com&sz=128' },
-  { label: 'Copilot', appUrl: 'copilot://', webUrl: 'https://copilot.money', icon: 'https://www.google.com/s2/favicons?domain=copilot.money&sz=128' },
+  { label: 'Todoist', appUrl: 'todoist://', webUrl: 'https://todoist.com/app', icon: 'https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://todoist.com&size=256' },
+  { label: 'Gmail', appUrl: 'googlegmail://', webUrl: 'https://mail.google.com', icon: 'https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://mail.google.com&size=256' },
+  { label: 'LinkedIn', appUrl: 'linkedin://', webUrl: 'https://www.linkedin.com/feed/', icon: 'https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://linkedin.com&size=256' },
+  { label: 'Substack', appUrl: 'substack://', webUrl: 'https://substack.com/home', icon: 'https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://substack.com&size=256' },
+  { label: 'Happy Scale', appUrl: 'happyscale://', webUrl: 'https://happyscale.com', icon: 'https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://happyscale.com&size=256' },
+  { label: 'Copilot', appUrl: 'copilot://', webUrl: 'https://copilot.money', icon: 'https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://copilot.money&size=256' },
 ]
 
 function openApp(appUrl: string, webUrl: string) {

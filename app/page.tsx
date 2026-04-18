@@ -2,12 +2,14 @@ import { fetchStockQuotes } from '@/lib/stocks'
 import { fetchWSJNews } from '@/lib/wsj'
 import { fetchSportsNews } from '@/lib/sports'
 import { fetchDailyReads } from '@/lib/gmail'
+import { fetchYesterdayScores } from '@/lib/scores'
 import StocksSection from '@/components/StocksSection'
 import NewsSection from '@/components/NewsSection'
 import SportsSection from '@/components/SportsSection'
 import GmailSection from '@/components/GmailSection'
 import QuickLinks from '@/components/QuickLinks'
 import WeatherSection from '@/components/WeatherSection'
+import ScoresSection from '@/components/ScoresSection'
 
 export const revalidate = 3600
 
@@ -20,17 +22,19 @@ function formatDate() {
 }
 
 export default async function Home() {
-  const [stocks, news, sports, gmail] = await Promise.allSettled([
+  const [stocks, news, sports, gmail, scores] = await Promise.allSettled([
     fetchStockQuotes(),
     fetchWSJNews(),
     fetchSportsNews(),
     fetchDailyReads(),
+    fetchYesterdayScores(),
   ])
 
   const stockData = stocks.status === 'fulfilled' ? stocks.value : []
   const newsData = news.status === 'fulfilled' ? news.value : []
   const sportsData = sports.status === 'fulfilled' ? sports.value : []
   const gmailData = gmail.status === 'fulfilled' ? gmail.value : []
+  const scoresData = scores.status === 'fulfilled' ? scores.value : []
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -47,6 +51,8 @@ export default async function Home() {
         {newsData.length > 0 && <NewsSection items={newsData} />}
 
         <GmailSection threads={gmailData} />
+
+        <ScoresSection games={scoresData} />
 
         {sportsData.length > 0 && <SportsSection items={sportsData} />}
 
