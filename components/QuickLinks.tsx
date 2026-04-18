@@ -12,12 +12,25 @@ const LINKS = [
 ]
 
 function openApp(appUrl: string, webUrl: string) {
-  const start = Date.now()
-  const timeout = setTimeout(() => {
-    if (Date.now() - start < 1500) window.location.href = webUrl
-  }, 1000)
-  window.location.href = appUrl
-  window.addEventListener('blur', () => clearTimeout(timeout), { once: true })
+  // Use a hidden iframe to trigger the URL scheme — avoids navigating Morning Brief away
+  const iframe = document.createElement('iframe')
+  iframe.style.cssText = 'display:none;width:0;height:0;border:none;'
+  iframe.src = appUrl
+  document.body.appendChild(iframe)
+
+  // If app didn't open after 1.5s, open web version in a new tab so we stay here
+  const fallback = setTimeout(() => {
+    window.open(webUrl, '_blank', 'noopener,noreferrer')
+  }, 1500)
+
+  window.addEventListener('blur', () => {
+    clearTimeout(fallback)
+    document.body.removeChild(iframe)
+  }, { once: true })
+
+  setTimeout(() => {
+    if (document.body.contains(iframe)) document.body.removeChild(iframe)
+  }, 2000)
 }
 
 export default function QuickLinks() {
