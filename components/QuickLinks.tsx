@@ -31,13 +31,13 @@ export default function QuickLinks() {
           <button
             key={link.label}
             onClick={() => openApp(link.appUrl, link.webUrl)}
-            className="bg-gray-900 rounded-xl py-4 flex flex-col items-center gap-2 hover:bg-gray-800 transition-colors cursor-pointer"
+            className="bg-gray-900 rounded-xl py-3 flex flex-col items-center gap-2 hover:bg-gray-800 transition-colors cursor-pointer"
           >
             <Image
               src={link.icon}
               alt={link.label}
-              width={40}
-              height={40}
+              width={56}
+              height={56}
               className="rounded-xl"
               unoptimized
             />
