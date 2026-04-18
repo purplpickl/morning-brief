@@ -1,5 +1,6 @@
 export interface StockQuote {
   symbol: string
+  originalSymbol: string
   shortName: string
   price: number
   change: number
@@ -59,6 +60,7 @@ export async function fetchStockQuotes(): Promise<StockQuote[]> {
 
   return results.map((q: Record<string, unknown>) => ({
     symbol: DISPLAY_NAMES[q.symbol as string] ?? q.symbol,
+    originalSymbol: q.symbol as string,
     shortName: q.shortName ?? q.symbol,
     price: q.regularMarketPrice,
     change: q.regularMarketChange,

@@ -68,12 +68,20 @@ export async function GET(req: NextRequest) {
 
   const data = await res.json()
 
-  // Competitors live under header.competitions[0]
+  // Competitors: try header first, fall back to competitions[0]
   const comp = data.header?.competitions?.[0]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const competitors: any[] = comp?.competitors ?? []
   const homeComp = competitors.find(c => c.homeAway === 'home')
   const awayComp = competitors.find(c => c.homeAway === 'away')
+
+  // Fallback competitors with linescores from competitions[0]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const comp2 = data.competitions?.[0]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const competitors2: any[] = comp2?.competitors ?? []
+  const homeComp2 = competitors2.find((c: { homeAway: string }) => c.homeAway === 'home')
+  const awayComp2 = competitors2.find((c: { homeAway: string }) => c.homeAway === 'away')
 
   const homeName: string = homeComp?.team?.shortDisplayName ?? homeComp?.team?.displayName ?? ''
   const awayName: string = awayComp?.team?.shortDisplayName ?? awayComp?.team?.displayName ?? ''
@@ -94,7 +102,10 @@ export async function GET(req: NextRequest) {
     comp?.playoff?.seriesSummary ??
     data.header?.season?.type?.name === 'Postseason' ? comp?.notes?.[0]?.headline : undefined
 
-  const linescores = extractLinescores(homeComp, awayComp, leagueKey)
+  // Use whichever competitor source has linescores
+  const lsHome = (homeComp?.linescores?.length ? homeComp : homeComp2) ?? homeComp
+  const lsAway = (awayComp?.linescores?.length ? awayComp : awayComp2) ?? awayComp
+  const linescores = extractLinescores(lsHome, lsAway, leagueKey)
 
   // Leaders: top performers from data.leaders[]
   const leaders: GameDetail['leaders'] = []

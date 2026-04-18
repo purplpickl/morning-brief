@@ -24,26 +24,26 @@ function openApp(appUrl: string, webUrl: string) {
 
 export default function QuickLinks() {
   return (
-    <div className="grid grid-cols-3 gap-x-3 gap-y-4">
+    <div className="grid grid-cols-3 gap-x-4 gap-y-5">
       {LINKS.map(link => (
         <button
           key={link.label}
           onClick={() => openApp(link.appUrl, link.webUrl)}
-          className="flex flex-col items-center gap-1.5 group cursor-pointer"
+          className="flex flex-col items-center gap-2 group cursor-pointer"
         >
           <div
-            className="w-10 h-10 flex items-center justify-center transition-opacity group-hover:opacity-70"
-            style={{ border: '1px solid rgba(236,228,211,0.25)', padding: '4px' }}
+            className="w-14 h-14 flex items-center justify-center transition-opacity group-hover:opacity-70"
+            style={{ border: '1px solid rgba(236,228,211,0.25)', padding: '6px' }}
           >
             <Image
               src={link.icon}
               alt={link.label}
-              width={36}
-              height={36}
+              width={48}
+              height={48}
               unoptimized
             />
           </div>
-          <span className="font-label text-[9px] text-muted tracking-wider uppercase">
+          <span className="font-label text-[10px] text-muted tracking-wider uppercase">
             {link.label}
           </span>
         </button>

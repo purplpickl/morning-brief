@@ -40,10 +40,10 @@ html, body {
 
 .section-head h3 {
   font-family: var(--font-body, 'Source Serif 4', Georgia, serif);
-  font-size: 15px;
+  font-size: 20px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   color: #ece4d3;
   margin: 0;
 }

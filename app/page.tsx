@@ -34,12 +34,6 @@ function formatDate(): string {
   })
 }
 
-function editionNumber(): number {
-  return Math.floor(
-    (Date.now() - new Date('2026-01-01').getTime()) / 86400000
-  )
-}
-
 function SectionHead({ title, meta }: { title: string; meta?: string }) {
   return (
     <div className="section-head">
@@ -94,13 +88,13 @@ export default async function Home() {
         >
           {/* Edition line */}
           <div className="flex justify-between items-center mb-4">
-            <span className="font-label text-[11px] tracking-[0.14em] uppercase text-muted">
+            <span className="font-label text-[11px] tracking-[0.14em] uppercase text-muted hidden md:inline">
               Morning Edition
             </span>
             <span className="font-label text-[11px] tracking-[0.06em] text-muted">
               {formatDate()}
             </span>
-            <span className="font-label text-[11px] tracking-[0.14em] uppercase text-muted">
+            <span className="font-label text-[11px] tracking-[0.14em] uppercase text-muted text-right">
               <LocationLabel />
             </span>
           </div>
@@ -115,14 +109,11 @@ export default async function Home() {
 
           {/* Sub-masthead line */}
           <div
-            className="flex justify-between items-center mt-4 pt-2"
+            className="mt-4 pt-2"
             style={{ borderTop: '1px solid rgba(236,228,211,0.35)' }}
           >
             <span className="font-label text-[11px] text-muted">
               {getGreeting()}, Jacob
-            </span>
-            <span className="font-label text-[11px] text-muted">
-              No. {editionNumber()}
             </span>
           </div>
         </div>
