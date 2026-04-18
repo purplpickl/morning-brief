@@ -21,6 +21,33 @@ export interface GameDetail {
   leaders: { team: 'home' | 'away'; name: string; stat: string; shortName: string }[]
 }
 
+const periodLabel = (leagueKey: string, i: number): string => {
+  if (leagueKey === 'MLB') return `${i + 1}`
+  if (leagueKey === 'NFL') return ['Q1', 'Q2', 'Q3', 'Q4', 'OT'][i] ?? `OT${i - 3}`
+  if (leagueKey === 'NBA') return ['Q1', 'Q2', 'Q3', 'Q4', 'OT'][i] ?? `OT${i - 3}`
+  if (leagueKey === 'NHL') return ['P1', 'P2', 'P3', 'OT'][i] ?? `OT${i - 2}`
+  return `${i + 1}`
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function extractLinescores(homeComp: any, awayComp: any, leagueKey: string): GameDetail['linescores'] {
+  // ESPN puts linescores either on the competitor object directly or nested under linescores[]
+  const homeLs: { value: number }[] = homeComp?.linescores ?? []
+  const awayLs: { value: number }[] = awayComp?.linescores ?? []
+  const count = Math.max(homeLs.length, awayLs.length)
+  if (count === 0) return []
+
+  const result: GameDetail['linescores'] = []
+  for (let i = 0; i < count; i++) {
+    result.push({
+      label: periodLabel(leagueKey, i),
+      home: homeLs[i]?.value ?? '-',
+      away: awayLs[i]?.value ?? '-',
+    })
+  }
+  return result
+}
+
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl
   const gameId = searchParams.get('id')
@@ -41,47 +68,41 @@ export async function GET(req: NextRequest) {
 
   const data = await res.json()
 
+  // Competitors live under header.competitions[0]
   const comp = data.header?.competitions?.[0]
-  const homeComp = comp?.competitors?.find((c: { homeAway: string }) => c.homeAway === 'home')
-  const awayComp = comp?.competitors?.find((c: { homeAway: string }) => c.homeAway === 'away')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const competitors: any[] = comp?.competitors ?? []
+  const homeComp = competitors.find(c => c.homeAway === 'home')
+  const awayComp = competitors.find(c => c.homeAway === 'away')
 
   const homeName: string = homeComp?.team?.shortDisplayName ?? homeComp?.team?.displayName ?? ''
   const awayName: string = awayComp?.team?.shortDisplayName ?? awayComp?.team?.displayName ?? ''
   const homeScore: number = parseInt(homeComp?.score ?? '0')
   const awayScore: number = parseInt(awayComp?.score ?? '0')
-  const homeRecord: string | undefined = homeComp?.record?.[0]?.summary
-  const awayRecord: string | undefined = awayComp?.record?.[0]?.summary
-  const seriesSummary: string | undefined = comp?.series?.summary ?? comp?.playoff?.seriesSummary
 
-  // Line scores (quarters/periods/innings)
-  const linescores: GameDetail['linescores'] = []
-  const homeLinescore: { value: number }[] = homeComp?.linescores ?? []
-  const awayLinescore: { value: number }[] = awayComp?.linescores ?? []
-  const count = Math.max(homeLinescore.length, awayLinescore.length)
+  // Records: check both record[] and statistics[] paths ESPN uses
+  const homeRecord: string | undefined =
+    homeComp?.record?.[0]?.summary ??
+    homeComp?.records?.[0]?.summary
+  const awayRecord: string | undefined =
+    awayComp?.record?.[0]?.summary ??
+    awayComp?.records?.[0]?.summary
 
-  const periodLabel = (leagueKey: string, i: number) => {
-    if (leagueKey === 'MLB') return `${i + 1}`
-    if (leagueKey === 'NFL') return ['Q1','Q2','Q3','Q4','OT'][i] ?? `OT${i - 3}`
-    if (leagueKey === 'NBA') return ['Q1','Q2','Q3','Q4','OT'][i] ?? `OT${i - 3}`
-    if (leagueKey === 'NHL') return ['P1','P2','P3','OT'][i] ?? `OT${i - 2}`
-    return `${i + 1}`
-  }
+  // Series summary: check multiple ESPN paths
+  const seriesSummary: string | undefined =
+    comp?.series?.summary ??
+    comp?.playoff?.seriesSummary ??
+    data.header?.season?.type?.name === 'Postseason' ? comp?.notes?.[0]?.headline : undefined
 
-  for (let i = 0; i < count; i++) {
-    linescores.push({
-      label: periodLabel(leagueKey, i),
-      home: homeLinescore[i]?.value ?? '-',
-      away: awayLinescore[i]?.value ?? '-',
-    })
-  }
+  const linescores = extractLinescores(homeComp, awayComp, leagueKey)
 
-  // Leaders
+  // Leaders: top performers from data.leaders[]
   const leaders: GameDetail['leaders'] = []
   for (const leaderGroup of data.leaders ?? []) {
     for (const leader of leaderGroup.leaders ?? []) {
       const athlete = leader.athlete
       if (!athlete) continue
-      const teamId = athlete.team?.id
+      const teamId = athlete.team?.id ?? leader.team?.id
       const homeTeamId = homeComp?.team?.id
       leaders.push({
         team: teamId === homeTeamId ? 'home' : 'away',
@@ -89,12 +110,12 @@ export async function GET(req: NextRequest) {
         shortName: athlete.shortName ?? athlete.displayName ?? '',
         stat: leader.displayValue ?? '',
       })
-      if (leaders.length >= 4) break
+      if (leaders.length >= 6) break
     }
-    if (leaders.length >= 4) break
+    if (leaders.length >= 6) break
   }
 
-  const detail: GameDetail = {
+  return NextResponse.json({
     homeName,
     awayName,
     homeScore,
@@ -104,7 +125,5 @@ export async function GET(req: NextRequest) {
     seriesSummary,
     linescores,
     leaders,
-  }
-
-  return NextResponse.json(detail)
+  } satisfies GameDetail)
 }
