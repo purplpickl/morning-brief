@@ -1,65 +1,58 @@
-import Image from "next/image";
+import { fetchStockQuotes } from '@/lib/stocks'
+import { fetchWSJNews } from '@/lib/wsj'
+import { fetchSportsNews } from '@/lib/sports'
+import { fetchDailyReads } from '@/lib/gmail'
+import StocksSection from '@/components/StocksSection'
+import NewsSection from '@/components/NewsSection'
+import SportsSection from '@/components/SportsSection'
+import GmailSection from '@/components/GmailSection'
+import QuickLinks from '@/components/QuickLinks'
 
-export default function Home() {
+export const revalidate = 3600
+
+function formatDate() {
+  return new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  })
+}
+
+export default async function Home() {
+  const [stocks, news, sports, gmail] = await Promise.allSettled([
+    fetchStockQuotes(),
+    fetchWSJNews(),
+    fetchSportsNews(),
+    fetchDailyReads(),
+  ])
+
+  const stockData = stocks.status === 'fulfilled' ? stocks.value : []
+  const newsData = news.status === 'fulfilled' ? news.value : []
+  const sportsData = sports.status === 'fulfilled' ? sports.value : []
+  const gmailData = gmail.status === 'fulfilled' ? gmail.value : []
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen bg-black text-white">
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-8">
+        <div>
+          <h1 className="text-2xl font-bold">Good morning, Jacob.</h1>
+          <p className="text-gray-400 text-sm mt-0.5">{formatDate()}</p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+
+        <QuickLinks />
+
+        {newsData.length > 0 && <NewsSection items={newsData} />}
+
+        <GmailSection threads={gmailData} />
+
+        {sportsData.length > 0 && <SportsSection items={sportsData} />}
+
+        {stockData.length > 0 && <StocksSection stocks={stockData} />}
+
+        <p className="text-center text-gray-600 text-xs pb-4">
+          Refreshed daily at 6am ET
+        </p>
+      </div>
+    </main>
+  )
 }
