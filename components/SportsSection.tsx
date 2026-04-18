@@ -1,4 +1,9 @@
+'use client'
+
+import { useState } from 'react'
 import { SportsItem } from '@/lib/sports'
+
+const DEFAULT_ITEMS = 4
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime()
@@ -9,10 +14,16 @@ function timeAgo(dateStr: string): string {
 }
 
 export default function SportsSection({ items }: { items: SportsItem[] }) {
+  const [expanded, setExpanded] = useState(false)
+
   if (items.length === 0) return null
+
+  const visible = expanded ? items : items.slice(0, DEFAULT_ITEMS)
+  const hasMore = items.length > DEFAULT_ITEMS
+
   return (
     <div>
-      {items.map((item, i) => (
+      {visible.map((item, i) => (
         <a
           key={i}
           href={item.link}
@@ -44,6 +55,16 @@ export default function SportsSection({ items }: { items: SportsItem[] }) {
           </span>
         </a>
       ))}
+
+      {!expanded && hasMore && (
+        <button
+          onClick={() => setExpanded(true)}
+          className="mt-4 font-label text-[11px] tracking-wider uppercase text-muted hover:text-ink transition-colors"
+          style={{ borderBottom: '1px solid rgba(148,138,121,0.5)', paddingBottom: '1px' }}
+        >
+          See more
+        </button>
+      )}
     </div>
   )
 }

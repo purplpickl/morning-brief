@@ -1,6 +1,9 @@
 'use client'
 
+import { useState } from 'react'
 import { NewsItem } from '@/lib/wsj'
+
+const DEFAULT_SECONDARY = 3
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime()
@@ -10,10 +13,26 @@ function timeAgo(dateStr: string): string {
   return `${m}m ago`
 }
 
+function SeeMore({ onShow }: { onShow: () => void }) {
+  return (
+    <button
+      onClick={onShow}
+      className="mt-4 font-label text-[11px] tracking-wider uppercase text-muted hover:text-ink transition-colors"
+      style={{ borderBottom: '1px solid rgba(148,138,121,0.5)', paddingBottom: '1px' }}
+    >
+      See more
+    </button>
+  )
+}
+
 export default function NewsSection({ items }: { items: NewsItem[] }) {
+  const [expanded, setExpanded] = useState(false)
+
   if (items.length === 0) return null
 
   const [lead, ...rest] = items
+  const visible = expanded ? rest : rest.slice(0, DEFAULT_SECONDARY)
+  const hasMore = rest.length > DEFAULT_SECONDARY
 
   return (
     <div>
@@ -36,9 +55,9 @@ export default function NewsSection({ items }: { items: NewsItem[] }) {
       </div>
 
       {/* Secondary articles */}
-      {rest.length > 0 && (
+      {visible.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 md:gap-x-7">
-          {rest.map((item, i) => (
+          {visible.map((item, i) => (
             <div
               key={i}
               className="py-3"
@@ -59,6 +78,8 @@ export default function NewsSection({ items }: { items: NewsItem[] }) {
           ))}
         </div>
       )}
+
+      {!expanded && hasMore && <SeeMore onShow={() => setExpanded(true)} />}
     </div>
   )
 }

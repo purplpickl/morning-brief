@@ -213,6 +213,42 @@ function GameCard({ game, onClick }: { game: GameScore; onClick: () => void }) {
   )
 }
 
+const DEFAULT_GAMES = 4
+
+function LeagueScores({
+  league,
+  games,
+  onSelect,
+}: {
+  league: string
+  games: GameScore[]
+  onSelect: (g: GameScore) => void
+}) {
+  const [expanded, setExpanded] = useState(false)
+  const visible = expanded ? games : games.slice(0, DEFAULT_GAMES)
+  const hasMore = games.length > DEFAULT_GAMES
+
+  return (
+    <div>
+      <p className="font-label text-[10px] text-muted tracking-wider uppercase mb-1.5">{league}</p>
+      <div className="grid grid-cols-2 gap-1.5">
+        {visible.map((game, i) => (
+          <GameCard key={i} game={game} onClick={() => onSelect(game)} />
+        ))}
+      </div>
+      {!expanded && hasMore && (
+        <button
+          onClick={() => setExpanded(true)}
+          className="mt-2 font-label text-[11px] tracking-wider uppercase text-muted hover:text-ink transition-colors"
+          style={{ borderBottom: '1px solid rgba(148,138,121,0.5)', paddingBottom: '1px' }}
+        >
+          See more
+        </button>
+      )}
+    </div>
+  )
+}
+
 export default function ScoresSection({ games }: { games: GameScore[] }) {
   const [selected, setSelected] = useState<GameScore | null>(null)
 
@@ -229,14 +265,7 @@ export default function ScoresSection({ games }: { games: GameScore[] }) {
     <>
       <div className="space-y-4">
         {byLeague.map(({ league, games }) => (
-          <div key={league}>
-            <p className="font-label text-[10px] text-muted tracking-wider uppercase mb-1.5">{league}</p>
-            <div className="grid grid-cols-2 gap-1.5">
-              {games.map((game, i) => (
-                <GameCard key={i} game={game} onClick={() => setSelected(game)} />
-              ))}
-            </div>
-          </div>
+          <LeagueScores key={league} league={league} games={games} onSelect={setSelected} />
         ))}
       </div>
 
