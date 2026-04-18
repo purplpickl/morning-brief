@@ -16,8 +16,8 @@ export default function LocationLabel() {
           )
           const data = await res.json()
           const city = data.address?.city ?? data.address?.town ?? data.address?.village ?? ''
-          const state = data.address?.state ?? ''
-          setLocation(city && state ? `${city}, ${state}` : city || state || 'Unknown')
+          const stateCode = data.address?.['ISO3166-2-lvl4']?.split('-')[1] ?? ''
+          setLocation(city && stateCode ? `${city}, ${stateCode}` : city || stateCode || 'Unknown')
         } catch {
           setLocation('Unknown')
         }

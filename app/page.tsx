@@ -129,16 +129,13 @@ export default async function Home() {
 
         {/* ── 3-col row: Weather | Calendar | Quick Links ───────────────── */}
         <div
-          className="grid"
-          style={{
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            borderBottom: '1px solid rgba(236,228,211,0.35)',
-          }}
+          className="grid grid-cols-1 md:grid-cols-3"
+          style={{ borderBottom: '1px solid rgba(236,228,211,0.35)' }}
         >
           {/* Weather */}
           <div
-            className="py-5 pr-6"
-            style={{ borderRight: '1px solid rgba(236,228,211,0.35)' }}
+            className="py-5 md:pr-6 border-b md:border-b-0 md:border-r"
+            style={{ borderColor: 'rgba(236,228,211,0.35)' }}
           >
             <p className="col-label">Weather</p>
             <WeatherSection />
@@ -146,15 +143,15 @@ export default async function Home() {
 
           {/* Calendar */}
           <div
-            className="py-5 px-6"
-            style={{ borderRight: '1px solid rgba(236,228,211,0.35)' }}
+            className="py-5 md:px-6 border-b md:border-b-0 md:border-r"
+            style={{ borderColor: 'rgba(236,228,211,0.35)' }}
           >
             <p className="col-label">Today&apos;s Schedule</p>
             <CalendarSection events={calEvents} />
           </div>
 
           {/* Quick Links */}
-          <div className="py-5 pl-6">
+          <div className="py-5 md:pl-6">
             <p className="col-label">Quick Access</p>
             <QuickLinks />
           </div>
@@ -181,8 +178,7 @@ export default async function Home() {
           <>
             <SectionHead title="Sports" />
             <div
-              className="grid gap-10"
-              style={{ gridTemplateColumns: sportsData.length > 0 ? '1fr 1fr' : '1fr' }}
+              className={`grid gap-10 grid-cols-1 ${sportsData.length > 0 ? 'md:grid-cols-2' : ''}`}
             >
               <div>
                 <p className="col-label">Yesterday&apos;s Scores</p>

@@ -33,9 +33,8 @@ export default function StocksSection({ stocks }: { stocks: StockQuote[] }) {
       {/* Indices — horizontal row */}
       {indices.length > 0 && (
         <div
-          className="grid pb-5 mb-5"
+          className="grid grid-cols-2 md:grid-cols-4 pb-5 mb-5"
           style={{
-            gridTemplateColumns: `repeat(${indices.length}, 1fr)`,
             gap: '16px',
             borderBottom: '1px solid rgba(236,228,211,0.35)',
           }}
@@ -58,7 +57,8 @@ export default function StocksSection({ stocks }: { stocks: StockQuote[] }) {
       ].filter(g => g.items.length > 0).map(({ label, items }) => (
         <div key={label} className="mb-6">
           <p className="font-label text-[10px] text-muted tracking-wider uppercase mb-2">{label}</p>
-          <table className="w-full" style={{ borderCollapse: 'collapse' }}>
+          <div className="overflow-x-auto">
+          <table className="w-full" style={{ borderCollapse: 'collapse', minWidth: '320px' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid rgba(236,228,211,0.35)' }}>
                 {['Ticker', 'Name', 'Last', 'Chg / %'].map(h => (
@@ -95,6 +95,7 @@ export default function StocksSection({ stocks }: { stocks: StockQuote[] }) {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       ))}
     </div>

@@ -126,18 +126,13 @@ export default function NewsSection({ items }: { items: NewsItem[] }) {
 
       {/* Secondary articles — 3-col grid */}
       {rest.length > 0 && (
-        <div
-          className="grid"
-          style={{ gridTemplateColumns: 'repeat(3, 1fr)', columnGap: '28px' }}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-3 md:gap-x-7">
           {rest.map((item, i) => (
             <div
               key={i}
               className="py-3"
               style={{
                 borderBottom: '1px dotted rgba(236,228,211,0.25)',
-                borderRight: (i + 1) % 3 !== 0 ? '1px dotted rgba(236,228,211,0.25)' : 'none',
-                paddingRight: (i + 1) % 3 !== 0 ? '28px' : '0',
                 opacity: feedback[item.link] === 'down' ? 0.4 : 1,
               }}
             >
