@@ -129,15 +129,15 @@ export default function WeatherSection() {
         <span className="text-4xl">{weatherIcon(current.code)}</span>
       </div>
 
-      {/* Hourly — 4-col wrapping grid (newspaper card style) */}
-      <div className="grid grid-cols-4 gap-1.5">
+      {/* Hourly — horizontal scroll */}
+      <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
         {hourly.map((slot, i) => (
           <div
             key={i}
-            className="flex flex-col items-center gap-1 py-2"
-            style={{ border: '1px solid rgba(236,228,211,0.18)' }}
+            className="flex flex-col items-center gap-1 py-2 px-3 shrink-0"
+            style={{ border: '1px solid rgba(236,228,211,0.18)', minWidth: '52px' }}
           >
-            <span className="font-label text-[9px] text-muted">
+            <span className="font-label text-[9px] text-muted whitespace-nowrap">
               {i === 0 ? 'Now' : formatHour(slot.time)}
             </span>
             <span className="text-sm">{weatherIcon(slot.code)}</span>

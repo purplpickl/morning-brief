@@ -22,7 +22,7 @@ const jetbrains = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Morning Brief",
+  title: "The Daily Jacob",
   description: "Jacob's daily morning dashboard",
 }
 

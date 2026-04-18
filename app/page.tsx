@@ -15,15 +15,9 @@ import WeatherSection from '@/components/WeatherSection'
 import LocationLabel from '@/components/LocationLabel'
 import ScoresSection from '@/components/ScoresSection'
 import CalendarSection from '@/components/CalendarSection'
+import GlanceSection from '@/components/GlanceSection'
 
 export const revalidate = 3600
-
-function getGreeting(): string {
-  const h = new Date().getHours()
-  if (h < 12) return 'Good morning'
-  if (h < 17) return 'Good afternoon'
-  return 'Good evening'
-}
 
 function formatDate(): string {
   return new Date().toLocaleDateString('en-US', {
@@ -104,19 +98,12 @@ export default async function Home() {
             className="font-masthead leading-none tracking-tight"
             style={{ fontSize: 'clamp(52px, 8vw, 104px)' }}
           >
-            Morning Brief
+            The Daily Jacob
           </h1>
-
-          {/* Sub-masthead line */}
-          <div
-            className="mt-4 pt-2"
-            style={{ borderTop: '1px solid rgba(236,228,211,0.35)' }}
-          >
-            <span className="font-label text-[11px] text-muted">
-              {getGreeting()}, Jacob
-            </span>
-          </div>
         </div>
+
+        {/* ── At a Glance ───────────────────────────────────────────────── */}
+        <GlanceSection calEvents={calEvents} stocks={stockData} />
 
         {/* ── 3-col row: Weather | Calendar | Quick Links ───────────────── */}
         <div
@@ -199,7 +186,7 @@ export default async function Home() {
           style={{ borderTop: '1px solid rgba(236,228,211,0.2)' }}
         >
           <span>Refreshed daily at 6am ET</span>
-          <span>Morning Brief — Personal Edition</span>
+          <span>The Daily Jacob — Personal Edition</span>
         </div>
 
       </div>
