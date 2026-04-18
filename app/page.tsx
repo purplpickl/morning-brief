@@ -7,6 +7,7 @@ import NewsSection from '@/components/NewsSection'
 import SportsSection from '@/components/SportsSection'
 import GmailSection from '@/components/GmailSection'
 import QuickLinks from '@/components/QuickLinks'
+import WeatherSection from '@/components/WeatherSection'
 
 export const revalidate = 3600
 
@@ -38,6 +39,8 @@ export default async function Home() {
           <h1 className="text-2xl font-bold">Good morning, Jacob.</h1>
           <p className="text-gray-400 text-sm mt-0.5">{formatDate()}</p>
         </div>
+
+        <WeatherSection />
 
         <QuickLinks />
 
