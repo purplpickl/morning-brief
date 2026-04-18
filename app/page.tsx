@@ -4,6 +4,8 @@ import { fetchFTNews } from '@/lib/ft'
 import { fetchSportsNews } from '@/lib/sports'
 import { fetchDailyReads } from '@/lib/gmail'
 import { fetchYesterdayScores } from '@/lib/scores'
+import { fetchGoogleCalendar } from '@/lib/gcal'
+import { fetchOutlookCalendar } from '@/lib/outlook'
 import StocksSection from '@/components/StocksSection'
 import NewsSection from '@/components/NewsSection'
 import SportsSection from '@/components/SportsSection'
@@ -11,84 +13,207 @@ import GmailSection from '@/components/GmailSection'
 import QuickLinks from '@/components/QuickLinks'
 import WeatherSection from '@/components/WeatherSection'
 import ScoresSection from '@/components/ScoresSection'
-import CollapsibleSection from '@/components/CollapsibleSection'
+import CalendarSection from '@/components/CalendarSection'
 
 export const revalidate = 3600
 
-function formatDate() {
+function getGreeting(): string {
+  const h = new Date().getHours()
+  if (h < 12) return 'Good morning'
+  if (h < 17) return 'Good afternoon'
+  return 'Good evening'
+}
+
+function formatDate(): string {
   return new Date().toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
+    year: 'numeric',
   })
 }
 
+function editionNumber(): number {
+  return Math.floor(
+    (Date.now() - new Date('2026-01-01').getTime()) / 86400000
+  )
+}
+
+function SectionHead({ title, meta }: { title: string; meta?: string }) {
+  return (
+    <div className="section-head">
+      <h3>{title}</h3>
+      {meta && <span>{meta}</span>}
+    </div>
+  )
+}
+
 export default async function Home() {
-  const [stocks, wsj, ft, sports, gmail, scores] = await Promise.allSettled([
+  const [stocks, wsj, ft, sports, gmail, scores, gcal, outlook] = await Promise.allSettled([
     fetchStockQuotes(),
     fetchWSJNews(),
     fetchFTNews(),
     fetchSportsNews(),
     fetchDailyReads(),
     fetchYesterdayScores(),
+    fetchGoogleCalendar(),
+    fetchOutlookCalendar(),
   ])
 
-  const stockData = stocks.status === 'fulfilled' ? stocks.value : []
-  const wsjData  = wsj.status   === 'fulfilled' ? wsj.value   : []
-  const ftData   = ft.status    === 'fulfilled' ? ft.value    : []
-  const sportsData = sports.status === 'fulfilled' ? sports.value : []
-  const gmailData  = gmail.status  === 'fulfilled' ? gmail.value  : []
-  const scoresData = scores.status === 'fulfilled' ? scores.value : []
+  const stockData   = stocks.status   === 'fulfilled' ? stocks.value   : []
+  const wsjData     = wsj.status      === 'fulfilled' ? wsj.value      : []
+  const ftData      = ft.status       === 'fulfilled' ? ft.value       : []
+  const sportsData  = sports.status   === 'fulfilled' ? sports.value   : []
+  const gmailData   = gmail.status    === 'fulfilled' ? gmail.value    : []
+  const scoresData  = scores.status   === 'fulfilled' ? scores.value   : []
+  const gcalData    = gcal.status     === 'fulfilled' ? gcal.value     : []
+  const outlookData = outlook.status  === 'fulfilled' ? outlook.value  : []
 
-  // Merge FT + WSJ, sort newest first
   const newsData = [...ftData, ...wsjData].sort(
     (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
   )
 
-  const hasSports = sportsData.length > 0 || scoresData.length > 0
+  const calEvents = [...gcalData, ...outlookData].sort(
+    (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime()
+  )
+
+  const hasSports = scoresData.length > 0 || sportsData.length > 0
 
   return (
-    <main className="min-h-screen bg-black text-white">
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-8">
-        <div>
-          <h1 className="text-2xl font-bold">Good morning, Jacob.</h1>
-          <p className="text-gray-400 text-sm mt-0.5">{formatDate()}</p>
+    <main className="min-h-screen bg-paper text-ink">
+      <div
+        className="mx-auto pb-20"
+        style={{ maxWidth: '1400px', padding: '0 clamp(20px, 4vw, 64px) 80px' }}
+      >
+
+        {/* ── Masthead ──────────────────────────────────────────────────── */}
+        <div
+          className="text-center pt-8 pb-6"
+          style={{ borderBottom: '1px solid rgba(236,228,211,0.35)' }}
+        >
+          {/* Edition line */}
+          <div className="flex justify-between items-center mb-4">
+            <span className="font-label text-[11px] tracking-[0.14em] uppercase text-muted">
+              Morning Edition
+            </span>
+            <span className="font-label text-[11px] tracking-[0.06em] text-muted">
+              {formatDate()}
+            </span>
+            <span className="font-label text-[11px] tracking-[0.14em] uppercase text-muted">
+              Austin, TX
+            </span>
+          </div>
+
+          {/* Title */}
+          <h1
+            className="font-masthead leading-none tracking-tight"
+            style={{ fontSize: 'clamp(52px, 8vw, 104px)' }}
+          >
+            Morning Brief
+          </h1>
+
+          {/* Sub-masthead line */}
+          <div
+            className="flex justify-between items-center mt-4 pt-2"
+            style={{ borderTop: '1px solid rgba(236,228,211,0.35)' }}
+          >
+            <span className="font-label text-[11px] text-muted">
+              {getGreeting()}, Jacob
+            </span>
+            <span className="font-label text-[11px] text-muted">
+              No. {editionNumber()}
+            </span>
+          </div>
         </div>
 
-        <WeatherSection />
+        {/* ── 3-col row: Weather | Calendar | Quick Links ───────────────── */}
+        <div
+          className="grid"
+          style={{
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            borderBottom: '1px solid rgba(236,228,211,0.35)',
+          }}
+        >
+          {/* Weather */}
+          <div
+            className="py-5 pr-6"
+            style={{ borderRight: '1px solid rgba(236,228,211,0.35)' }}
+          >
+            <p className="col-label">Weather</p>
+            <WeatherSection />
+          </div>
 
-        <QuickLinks />
+          {/* Calendar */}
+          <div
+            className="py-5 px-6"
+            style={{ borderRight: '1px solid rgba(236,228,211,0.35)' }}
+          >
+            <p className="col-label">Today&apos;s Schedule</p>
+            <CalendarSection events={calEvents} />
+          </div>
 
+          {/* Quick Links */}
+          <div className="py-5 pl-6">
+            <p className="col-label">Quick Access</p>
+            <QuickLinks />
+          </div>
+        </div>
+
+        {/* ── News ──────────────────────────────────────────────────────── */}
         {newsData.length > 0 && (
-          <CollapsibleSection title="News" badge={newsData.length}>
+          <>
+            <SectionHead title="News" meta={`${newsData.length} stories`} />
             <NewsSection items={newsData} />
-          </CollapsibleSection>
+          </>
         )}
 
-        <CollapsibleSection title="Daily Reads" badge={gmailData.length || undefined}>
-          <GmailSection threads={gmailData} />
-        </CollapsibleSection>
+        {/* ── Daily Reads ───────────────────────────────────────────────── */}
+        {gmailData.length > 0 && (
+          <>
+            <SectionHead title="Daily Reads" meta={`${gmailData.length} newsletters`} />
+            <GmailSection threads={gmailData} />
+          </>
+        )}
 
+        {/* ── Sports ────────────────────────────────────────────────────── */}
         {hasSports && (
-          <CollapsibleSection title="Sports" badge={scoresData.length + sportsData.length || undefined}>
-            <div className="mb-4">
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Yesterday&apos;s Scores</p>
-              <ScoresSection games={scoresData} />
-              {sportsData.length > 0 && <div className="border-t border-gray-800 mt-4" />}
+          <>
+            <SectionHead title="Sports" />
+            <div
+              className="grid gap-10"
+              style={{ gridTemplateColumns: sportsData.length > 0 ? '1fr 1fr' : '1fr' }}
+            >
+              <div>
+                <p className="col-label">Yesterday&apos;s Scores</p>
+                <ScoresSection games={scoresData} />
+              </div>
+              {sportsData.length > 0 && (
+                <div>
+                  <p className="col-label">Latest</p>
+                  <SportsSection items={sportsData} />
+                </div>
+              )}
             </div>
-            {sportsData.length > 0 && <SportsSection items={sportsData} />}
-          </CollapsibleSection>
+          </>
         )}
 
+        {/* ── Markets ───────────────────────────────────────────────────── */}
         {stockData.length > 0 && (
-          <CollapsibleSection title="Stocks">
+          <>
+            <SectionHead title="Markets" />
             <StocksSection stocks={stockData} />
-          </CollapsibleSection>
+          </>
         )}
 
-        <p className="text-center text-gray-600 text-xs pb-4">
-          Refreshed daily at 6am ET
-        </p>
+        {/* ── Footer ────────────────────────────────────────────────────── */}
+        <div
+          className="flex justify-between items-center mt-16 pt-4 font-label text-[10px] text-muted italic"
+          style={{ borderTop: '1px solid rgba(236,228,211,0.2)' }}
+        >
+          <span>Refreshed daily at 6am ET</span>
+          <span>Morning Brief — Personal Edition</span>
+        </div>
+
       </div>
     </main>
   )

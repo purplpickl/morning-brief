@@ -1,5 +1,3 @@
-'use client'
-
 import { GmailThread } from '@/lib/gmail'
 
 function cleanFrom(from: string): string {
@@ -8,27 +6,26 @@ function cleanFrom(from: string): string {
 
 export default function GmailSection({ threads }: { threads: GmailThread[] }) {
   if (threads.length === 0) {
-    return (
-      <div className="bg-gray-900 rounded-xl px-4 py-4">
-        <p className="text-gray-400 text-sm">No newsletters today yet.</p>
-      </div>
-    )
+    return <p className="font-label text-xs text-muted italic">No newsletters today yet.</p>
   }
 
   return (
-    <div className="space-y-2">
+    <div className="grid gap-x-8" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
       {threads.map(thread => (
         <a
           key={thread.id}
           href={`https://mail.google.com/mail/u/0/#inbox/${thread.id}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="block bg-gray-900 rounded-xl px-4 py-3 hover:bg-gray-800 transition-colors"
+          className="block py-3 group"
+          style={{ borderBottom: '1px dotted rgba(236,228,211,0.25)' }}
         >
-          <p className="text-white text-sm font-medium leading-snug">{thread.subject}</p>
-          <p className="text-gray-400 text-xs mt-0.5">{cleanFrom(thread.from)}</p>
+          <h4 className="font-editorial text-[14px] font-semibold text-ink leading-snug group-hover:underline">
+            {thread.subject}
+          </h4>
+          <p className="font-label text-[10px] text-muted mt-0.5">{cleanFrom(thread.from)}</p>
           {thread.snippet && (
-            <p className="text-gray-500 text-xs mt-1 line-clamp-2">{thread.snippet}</p>
+            <p className="text-muted text-xs leading-relaxed line-clamp-2 mt-1">{thread.snippet}</p>
           )}
         </a>
       ))}

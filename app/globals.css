@@ -1,35 +1,78 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ─── The Daily: Color System ──────────────────────────────────────────── */
+@theme {
+  --color-paper:  #14120f;
+  --color-ink:    #ece4d3;
+  --color-muted:  #948a79;
+  --color-up:     #7fd39e;
+  --color-down:   #e07a7a;
+  --color-accent: #a83232;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html, body {
+  background: #14120f;
+  color: #ece4d3;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Typography Utilities ─────────────────────────────────────────────── */
+.font-masthead  { font-family: 'UnifrakturCook', 'Playfair Display', serif; }
+.font-editorial { font-family: var(--font-editorial, 'Playfair Display', Georgia, serif); }
+.font-label     { font-family: var(--font-label, 'JetBrains Mono', ui-monospace, monospace); }
+.font-body-serif{ font-family: var(--font-body, 'Source Serif 4', Georgia, serif); }
+
+/* ─── Editorial Layout Utilities ───────────────────────────────────────── */
+
+/* Thin hairline rule */
+.rule { border-color: rgba(236, 228, 211, 0.35); }
+
+/* Section header: thin top + bottom rule */
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(236, 228, 211, 0.35);
+  border-bottom: 1px solid rgba(236, 228, 211, 0.35);
+  padding: 5px 0;
+  margin-top: 44px;
+  margin-bottom: 22px;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.section-head h3 {
+  font-family: var(--font-body, 'Source Serif 4', Georgia, serif);
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #ece4d3;
+  margin: 0;
 }
 
+.section-head span {
+  font-family: var(--font-label, 'JetBrains Mono', monospace);
+  font-size: 10px;
+  color: #948a79;
+  letter-spacing: 0.08em;
+}
+
+/* Column subhead (inside a card column) */
+.col-label {
+  font-family: var(--font-label, 'JetBrains Mono', monospace);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #948a79;
+  margin-bottom: 14px;
+}
+
+/* Dotted row divider */
+.row-divider { border-bottom: 1px dotted rgba(236, 228, 211, 0.25); }
+
+/* ─── Score sheet modal animation ──────────────────────────────────────── */
 @keyframes slide-up {
   from { transform: translateY(100%); }
   to   { transform: translateY(0); }
 }
-
 .animate-slide-up {
   animation: slide-up 0.25s cubic-bezier(0.32, 0.72, 0, 1);
 }

@@ -1,16 +1,25 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from "next"
+import { Playfair_Display, Source_Serif_4, JetBrains_Mono } from "next/font/google"
+import "./globals.css"
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const playfair = Playfair_Display({
+  variable: "--font-editorial",
   subsets: ["latin"],
-});
+  weight: ["400", "500", "600", "700", "900"],
+  style: ["normal", "italic"],
+})
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const sourceSerif = Source_Serif_4({
+  variable: "--font-body",
   subsets: ["latin"],
-});
+  weight: ["300", "400", "600"],
+})
+
+const jetbrains = JetBrains_Mono({
+  variable: "--font-label",
+  subsets: ["latin"],
+  weight: ["300", "400", "600", "700"],
+})
 
 export const metadata: Metadata = {
   title: "Morning Brief",
@@ -18,21 +27,30 @@ export const metadata: Metadata = {
 }
 
 export const viewport = {
-  width: 'device-width',
+  width: "device-width",
   initialScale: 1,
 }
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${playfair.variable} ${sourceSerif.variable} ${jetbrains.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <head>
+        {/* UnifrakturCook — single-weight blackletter for masthead */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="min-h-full flex flex-col bg-paper text-ink">
+        {children}
+      </body>
     </html>
-  );
+  )
 }

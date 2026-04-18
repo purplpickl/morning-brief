@@ -57,8 +57,10 @@ function GameSheet({ game, onClose }: { game: GameScore; onClose: () => void }) 
         style={{ opacity: Math.max(0, 1 - dragY / 300) }}
       />
       <div
-        className="relative w-full bg-gray-950 border-t border-gray-800 rounded-t-2xl px-5 pt-4 pb-10 max-h-[82vh] overflow-y-auto animate-slide-up"
+        className="relative w-full rounded-t-2xl px-5 pt-4 pb-10 max-h-[82vh] overflow-y-auto animate-slide-up"
         style={{
+          background: '#1a1714',
+          borderTop: '1px solid rgba(236,228,211,0.35)',
           transform: `translateY(${dragY}px)`,
           transition: dragging ? 'none' : 'transform 0.2s ease',
         }}
@@ -73,14 +75,14 @@ function GameSheet({ game, onClose }: { game: GameScore; onClose: () => void }) 
         {/* Header */}
         <div className="flex justify-between items-center mb-5">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500 uppercase tracking-wider">{game.league}</span>
+            <span className="font-label text-[10px] text-muted tracking-wider uppercase">{game.league}</span>
             {game.playoffNote && (
-              <span className="text-xs bg-blue-900 text-blue-300 px-2 py-0.5 rounded-full font-medium">
+              <span className="font-label text-[10px] px-2 py-0.5" style={{ border: '1px solid rgba(96,165,250,0.5)', color: '#93c5fd' }}>
                 {game.playoffNote}
               </span>
             )}
           </div>
-          <button onClick={onClose} className="text-gray-500 hover:text-white p-1 -mr-1">
+          <button onClick={onClose} className="text-muted hover:text-ink p-1 -mr-1">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -91,67 +93,67 @@ function GameSheet({ game, onClose }: { game: GameScore; onClose: () => void }) 
         <div className="space-y-3 mb-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className={`text-xl font-bold ${awayWon ? 'text-white' : 'text-gray-500'}`}>{game.away}</p>
-              {detail?.awayRecord && <p className="text-xs text-gray-500 mt-0.5">{detail.awayRecord}</p>}
+              <p className={`font-editorial text-xl font-bold ${awayWon ? 'text-ink' : 'text-muted'}`}>{game.away}</p>
+              {detail?.awayRecord && <p className="font-label text-[10px] text-muted mt-0.5">{detail.awayRecord}</p>}
             </div>
-            <p className={`text-4xl font-bold tabular-nums ${awayWon ? 'text-white' : 'text-gray-500'}`}>
+            <p className={`font-editorial text-4xl font-bold tabular-nums ${awayWon ? 'text-ink' : 'text-muted'}`}>
               {game.awayScore}
             </p>
           </div>
-          <div className="border-t border-gray-800" />
+          <div style={{ borderTop: '1px solid rgba(236,228,211,0.25)' }} />
           <div className="flex items-center justify-between">
             <div>
-              <p className={`text-xl font-bold ${homeWon ? 'text-white' : 'text-gray-500'}`}>{game.home}</p>
-              {detail?.homeRecord && <p className="text-xs text-gray-500 mt-0.5">{detail.homeRecord}</p>}
+              <p className={`font-editorial text-xl font-bold ${homeWon ? 'text-ink' : 'text-muted'}`}>{game.home}</p>
+              {detail?.homeRecord && <p className="font-label text-[10px] text-muted mt-0.5">{detail.homeRecord}</p>}
             </div>
-            <p className={`text-4xl font-bold tabular-nums ${homeWon ? 'text-white' : 'text-gray-500'}`}>
+            <p className={`font-editorial text-4xl font-bold tabular-nums ${homeWon ? 'text-ink' : 'text-muted'}`}>
               {game.homeScore}
             </p>
           </div>
         </div>
 
-        <p className="text-xs text-gray-500 mb-4">{game.status}</p>
+        <p className="font-label text-[10px] text-muted mb-4 tracking-wider">{game.status}</p>
 
         {detail?.seriesSummary && (
-          <div className="bg-blue-950 border border-blue-800 rounded-xl px-4 py-2.5 mb-4">
-            <p className="text-blue-300 text-sm font-medium">{detail.seriesSummary}</p>
+          <div className="px-4 py-2.5 mb-4" style={{ border: '1px solid rgba(96,165,250,0.35)', background: 'rgba(30,58,138,0.15)' }}>
+            <p className="font-label text-[11px] font-semibold" style={{ color: '#93c5fd' }}>{detail.seriesSummary}</p>
           </div>
         )}
 
         {loading && (
-          <p className="text-gray-500 text-sm text-center py-4">Loading details...</p>
+          <p className="font-label text-xs text-muted text-center py-4">Loading details...</p>
         )}
 
         {detail && detail.linescores.length > 0 && (
-          <div className="bg-gray-900 rounded-xl px-4 py-3 mb-4 overflow-x-auto">
-            <table className="w-full text-xs tabular-nums">
+          <div className="px-4 py-3 mb-4 overflow-x-auto" style={{ border: '1px solid rgba(236,228,211,0.2)' }}>
+            <table className="w-full tabular-nums" style={{ borderCollapse: 'collapse', fontSize: '11px' }}>
               <thead>
                 <tr>
-                  <th className="text-left text-gray-500 font-normal pr-3 py-1 w-20" />
+                  <th className="text-left font-normal pr-3 py-1 w-20 font-label text-muted" />
                   {detail.linescores.map(ls => (
-                    <th key={ls.label} className="text-gray-500 font-normal text-center px-2 py-1 min-w-[2rem]">
+                    <th key={ls.label} className="font-label text-muted font-normal text-center px-2 py-1 min-w-[2rem]">
                       {ls.label}
                     </th>
                   ))}
-                  <th className="text-gray-400 font-semibold text-center px-2 py-1 min-w-[2rem]">T</th>
+                  <th className="font-label text-ink font-semibold text-center px-2 py-1 min-w-[2rem]">T</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td className="text-gray-400 pr-3 py-1 truncate max-w-[5rem]">{detail.awayName || game.away}</td>
+                  <td className="font-label text-muted pr-3 py-1 truncate max-w-[5rem]">{detail.awayName || game.away}</td>
                   {detail.linescores.map((ls, i) => (
-                    <td key={i} className="text-center px-2 py-1 text-gray-300">{ls.away}</td>
+                    <td key={i} className="text-center px-2 py-1 text-ink/80">{ls.away}</td>
                   ))}
-                  <td className={`text-center px-2 py-1 font-bold ${awayWon ? 'text-white' : 'text-gray-500'}`}>
+                  <td className={`text-center px-2 py-1 font-bold font-editorial ${awayWon ? 'text-ink' : 'text-muted'}`}>
                     {game.awayScore}
                   </td>
                 </tr>
                 <tr>
-                  <td className="text-gray-400 pr-3 py-1 truncate max-w-[5rem]">{detail.homeName || game.home}</td>
+                  <td className="font-label text-muted pr-3 py-1 truncate max-w-[5rem]">{detail.homeName || game.home}</td>
                   {detail.linescores.map((ls, i) => (
-                    <td key={i} className="text-center px-2 py-1 text-gray-300">{ls.home}</td>
+                    <td key={i} className="text-center px-2 py-1 text-ink/80">{ls.home}</td>
                   ))}
-                  <td className={`text-center px-2 py-1 font-bold ${homeWon ? 'text-white' : 'text-gray-500'}`}>
+                  <td className={`text-center px-2 py-1 font-bold font-editorial ${homeWon ? 'text-ink' : 'text-muted'}`}>
                     {game.homeScore}
                   </td>
                 </tr>
@@ -161,13 +163,13 @@ function GameSheet({ game, onClose }: { game: GameScore; onClose: () => void }) 
         )}
 
         {detail && detail.leaders.length > 0 && (
-          <div className="bg-gray-900 rounded-xl px-4 py-3">
-            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Leaders</p>
+          <div className="px-4 py-3" style={{ border: '1px solid rgba(236,228,211,0.2)' }}>
+            <p className="font-label text-[10px] text-muted uppercase tracking-wider mb-2">Leaders</p>
             <div className="space-y-1.5">
               {detail.leaders.map((l, i) => (
-                <div key={i} className="flex justify-between text-sm">
-                  <span className="text-gray-300">{l.shortName}</span>
-                  <span className="text-gray-500">{l.stat}</span>
+                <div key={i} className="flex justify-between">
+                  <span className="font-body-serif text-[13px] text-ink">{l.shortName}</span>
+                  <span className="font-label text-[11px] text-muted">{l.stat}</span>
                 </div>
               ))}
             </div>
@@ -186,19 +188,23 @@ function GameCard({ game, onClick }: { game: GameScore; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className={`w-full text-left px-3 py-2.5 rounded-xl text-xs transition-colors active:scale-95 ${
-        isHighlight ? 'bg-blue-950 border border-blue-800' : 'bg-gray-900 hover:bg-gray-800'
-      }`}
+      className="w-full text-left px-2.5 py-2 text-xs transition-opacity active:opacity-60"
+      style={{
+        border: isHighlight
+          ? '1px solid rgba(96,165,250,0.5)'
+          : '1px solid rgba(236,228,211,0.2)',
+        background: isHighlight ? 'rgba(30,58,138,0.2)' : 'transparent',
+      }}
     >
       <div className="flex justify-between items-center">
-        <span className={awayWon ? 'text-white font-semibold' : 'text-gray-400'}>{game.away}</span>
-        <span className={`tabular-nums font-bold ${awayWon ? 'text-white' : 'text-gray-400'}`}>{game.awayScore}</span>
+        <span className={`font-body-serif text-[13px] ${awayWon ? 'text-ink font-semibold' : 'text-muted'}`}>{game.away}</span>
+        <span className={`font-editorial tabular-nums text-[14px] font-bold ${awayWon ? 'text-ink' : 'text-muted'}`}>{game.awayScore}</span>
       </div>
       <div className="flex justify-between items-center mt-0.5">
-        <span className={homeWon ? 'text-white font-semibold' : 'text-gray-400'}>{game.home}</span>
-        <span className={`tabular-nums font-bold ${homeWon ? 'text-white' : 'text-gray-400'}`}>{game.homeScore}</span>
+        <span className={`font-body-serif text-[13px] ${homeWon ? 'text-ink font-semibold' : 'text-muted'}`}>{game.home}</span>
+        <span className={`font-editorial tabular-nums text-[14px] font-bold ${homeWon ? 'text-ink' : 'text-muted'}`}>{game.homeScore}</span>
       </div>
-      <p className="text-gray-600 text-xs mt-1.5">
+      <p className="font-label text-[9px] text-muted/60 mt-1.5 tracking-wider">
         {game.status}
         {isHighlight ? ` · ${game.highlight}` : ''}
         {game.playoffNote ? ` · ${game.playoffNote}` : ''}
@@ -211,9 +217,7 @@ export default function ScoresSection({ games }: { games: GameScore[] }) {
   const [selected, setSelected] = useState<GameScore | null>(null)
 
   if (games.length === 0) {
-    return (
-      <p className="text-gray-600 text-sm">No games yesterday.</p>
-    )
+    return <p className="font-label text-xs text-muted italic">No games yesterday.</p>
   }
 
   const byLeague = LEAGUE_ORDER.map(league => ({
@@ -226,8 +230,8 @@ export default function ScoresSection({ games }: { games: GameScore[] }) {
       <div className="space-y-4">
         {byLeague.map(({ league, games }) => (
           <div key={league}>
-            <p className="text-xs text-gray-500 mb-2">{league}</p>
-            <div className="grid grid-cols-2 gap-2">
+            <p className="font-label text-[10px] text-muted tracking-wider uppercase mb-1.5">{league}</p>
+            <div className="grid grid-cols-2 gap-1.5">
               {games.map((game, i) => (
                 <GameCard key={i} game={game} onClick={() => setSelected(game)} />
               ))}

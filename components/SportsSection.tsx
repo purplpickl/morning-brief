@@ -1,5 +1,3 @@
-'use client'
-
 import { SportsItem } from '@/lib/sports'
 
 function timeAgo(dateStr: string): string {
@@ -11,29 +9,41 @@ function timeAgo(dateStr: string): string {
 }
 
 export default function SportsSection({ items }: { items: SportsItem[] }) {
+  if (items.length === 0) return null
   return (
-    <div className="space-y-2">
-        {items.length === 0 && (
-          <p className="text-gray-500 text-sm">No sports news in the last 24 hours.</p>
-        )}
-        {items.map((item, i) => (
-          <a
-            key={i}
-            href={item.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block bg-gray-900 rounded-xl px-4 py-3 hover:bg-gray-800 transition-colors"
-          >
-            <div className="flex items-start justify-between gap-2">
-              <p className="text-white text-sm font-medium leading-snug">{item.title}</p>
-              <span className="text-xs text-gray-500 shrink-0">{item.source}</span>
-            </div>
-            {item.contentSnippet && (
-              <p className="text-gray-400 text-xs mt-1 line-clamp-2">{item.contentSnippet}</p>
+    <div>
+      {items.map((item, i) => (
+        <a
+          key={i}
+          href={item.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block py-3 group"
+          style={{ borderBottom: '1px dotted rgba(236,228,211,0.25)' }}
+        >
+          <div className="flex items-start justify-between gap-2">
+            <h4 className="font-editorial text-[14px] font-semibold text-ink leading-snug group-hover:underline">
+              {item.title}
+            </h4>
+            {item.source && (
+              <span
+                className="shrink-0 font-label text-[9px] text-muted mt-0.5"
+                style={{ border: '1px solid rgba(148,138,121,0.4)', padding: '1px 4px' }}
+              >
+                {item.source}
+              </span>
             )}
-            <p className="text-gray-500 text-xs mt-1">{timeAgo(item.pubDate)}</p>
-          </a>
-        ))}
+          </div>
+          {item.contentSnippet && (
+            <p className="text-muted text-xs leading-relaxed line-clamp-2 mt-1">
+              {item.contentSnippet}
+            </p>
+          )}
+          <span className="font-label text-[10px] text-muted/60 mt-1 block">
+            {timeAgo(item.pubDate)}
+          </span>
+        </a>
+      ))}
     </div>
   )
 }
