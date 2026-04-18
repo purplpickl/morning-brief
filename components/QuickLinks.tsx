@@ -4,6 +4,9 @@ const LINKS = [
   { label: 'Todoist', appUrl: 'todoist://', webUrl: 'https://todoist.com/app', emoji: '✅' },
   { label: 'Gmail', appUrl: 'googlegmail://', webUrl: 'https://mail.google.com', emoji: '📧' },
   { label: 'LinkedIn', appUrl: 'linkedin://', webUrl: 'https://www.linkedin.com/feed/', emoji: '💼' },
+  { label: 'Substack', appUrl: 'substack://', webUrl: 'https://substack.com/home', emoji: '📰' },
+  { label: 'Happy Scale', appUrl: 'happyscale://', webUrl: 'https://happyscale.com', emoji: '⚖️' },
+  { label: 'Copilot', appUrl: 'copilot://', webUrl: 'https://copilot.money', emoji: '💰' },
 ]
 
 function openApp(appUrl: string, webUrl: string) {
@@ -21,7 +24,7 @@ export default function QuickLinks() {
       <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">
         Quick Links
       </h2>
-      <div className="flex gap-3">
+      <div className="grid grid-cols-3 gap-3">
         {LINKS.map(link => (
           <button
             key={link.label}
