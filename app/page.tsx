@@ -15,7 +15,7 @@ import WeatherSection from '@/components/WeatherSection'
 import LocationLabel from '@/components/LocationLabel'
 import ScoresSection from '@/components/ScoresSection'
 import CalendarSection from '@/components/CalendarSection'
-import GlanceSection from '@/components/GlanceSection'
+import GreetingSection from '@/components/GreetingSection'
 
 export const revalidate = 3600
 
@@ -115,8 +115,8 @@ export default async function Home() {
           </h1>
         </div>
 
-        {/* ── At a Glance ───────────────────────────────────────────────── */}
-        <GlanceSection calEvents={calEvents} stocks={stockData} />
+        {/* ── Greeting ──────────────────────────────────────────────────── */}
+        <GreetingSection calEvents={calEvents} scores={scoresData} />
 
         {/* ── 3-col row: Weather | Calendar | Quick Links ───────────────── */}
         <div

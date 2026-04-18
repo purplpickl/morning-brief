@@ -236,13 +236,13 @@ function LeagueScores({
           <GameCard key={i} game={game} onClick={() => onSelect(game)} />
         ))}
       </div>
-      {!expanded && hasMore && (
+      {hasMore && (
         <button
-          onClick={() => setExpanded(true)}
+          onClick={() => setExpanded(v => !v)}
           className="mt-2 font-label text-[11px] tracking-wider uppercase text-muted hover:text-ink transition-colors"
           style={{ borderBottom: '1px solid rgba(148,138,121,0.5)', paddingBottom: '1px' }}
         >
-          See more
+          {expanded ? 'Show less' : 'See more'}
         </button>
       )}
     </div>

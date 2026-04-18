@@ -32,14 +32,14 @@ export default function QuickLinks() {
           className="flex flex-col items-center gap-2 group cursor-pointer"
         >
           <div
-            className="w-14 h-14 flex items-center justify-center transition-opacity group-hover:opacity-70"
+            className="w-16 h-16 flex items-center justify-center transition-opacity group-hover:opacity-70"
             style={{ border: '1px solid rgba(236,228,211,0.25)', padding: '6px' }}
           >
             <Image
               src={link.icon}
               alt={link.label}
-              width={48}
-              height={48}
+              width={56}
+              height={56}
               unoptimized
             />
           </div>

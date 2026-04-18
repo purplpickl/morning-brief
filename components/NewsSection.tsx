@@ -13,14 +13,14 @@ function timeAgo(dateStr: string): string {
   return `${m}m ago`
 }
 
-function SeeMore({ onShow }: { onShow: () => void }) {
+function ToggleBtn({ expanded, onToggle }: { expanded: boolean; onToggle: () => void }) {
   return (
     <button
-      onClick={onShow}
+      onClick={onToggle}
       className="mt-4 font-label text-[11px] tracking-wider uppercase text-muted hover:text-ink transition-colors"
       style={{ borderBottom: '1px solid rgba(148,138,121,0.5)', paddingBottom: '1px' }}
     >
-      See more
+      {expanded ? 'Show less' : 'See more'}
     </button>
   )
 }
@@ -79,7 +79,7 @@ export default function NewsSection({ items }: { items: NewsItem[] }) {
         </div>
       )}
 
-      {!expanded && hasMore && <SeeMore onShow={() => setExpanded(true)} />}
+      {hasMore && <ToggleBtn expanded={expanded} onToggle={() => setExpanded(v => !v)} />}
     </div>
   )
 }
