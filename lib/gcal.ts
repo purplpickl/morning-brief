@@ -28,6 +28,7 @@ export async function fetchGoogleCalendar(): Promise<CalEvent[]> {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const tokenData: any = await tokenRes.json()
+    console.log('[gcal] token response:', JSON.stringify(tokenData))
     const accessToken: string | undefined = tokenData.access_token
     if (!accessToken) return []
 
@@ -48,7 +49,11 @@ export async function fetchGoogleCalendar(): Promise<CalEvent[]> {
       `https://www.googleapis.com/calendar/v3/calendars/primary/events?${params}`,
       { headers: { Authorization: `Bearer ${accessToken}` }, next: { revalidate: 1800 } }
     )
-    if (!res.ok) return []
+    console.log('[gcal] calendar response status:', res.status)
+    if (!res.ok) {
+      console.log('[gcal] calendar error:', await res.text())
+      return []
+    }
 
     const data = await res.json()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
