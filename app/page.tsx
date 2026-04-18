@@ -1,5 +1,6 @@
 import { fetchStockQuotes } from '@/lib/stocks'
 import { fetchWSJNews } from '@/lib/wsj'
+import { fetchFTNews } from '@/lib/ft'
 import { fetchSportsNews } from '@/lib/sports'
 import { fetchDailyReads } from '@/lib/gmail'
 import { fetchYesterdayScores } from '@/lib/scores'
@@ -22,9 +23,10 @@ function formatDate() {
 }
 
 export default async function Home() {
-  const [stocks, news, sports, gmail, scores] = await Promise.allSettled([
+  const [stocks, news, ft, sports, gmail, scores] = await Promise.allSettled([
     fetchStockQuotes(),
     fetchWSJNews(),
+    fetchFTNews(),
     fetchSportsNews(),
     fetchDailyReads(),
     fetchYesterdayScores(),
@@ -32,6 +34,7 @@ export default async function Home() {
 
   const stockData = stocks.status === 'fulfilled' ? stocks.value : []
   const newsData = news.status === 'fulfilled' ? news.value : []
+  const ftData = ft.status === 'fulfilled' ? ft.value : []
   const sportsData = sports.status === 'fulfilled' ? sports.value : []
   const gmailData = gmail.status === 'fulfilled' ? gmail.value : []
   const scoresData = scores.status === 'fulfilled' ? scores.value : []
@@ -48,7 +51,9 @@ export default async function Home() {
 
         <QuickLinks />
 
-        {newsData.length > 0 && <NewsSection items={newsData} />}
+        {ftData.length > 0 && <NewsSection items={ftData} title="Financial Times" />}
+
+        {newsData.length > 0 && <NewsSection items={newsData} title="Wall Street Journal" />}
 
         <GmailSection threads={gmailData} />
 
