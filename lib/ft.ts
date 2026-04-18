@@ -22,6 +22,7 @@ export async function fetchFTNews(): Promise<NewsItem[]> {
           link: item.link ?? '',
           pubDate: item.pubDate ?? '',
           contentSnippet: item.contentSnippet,
+          source: 'FT',
         })
       }
     }

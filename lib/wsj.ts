@@ -5,6 +5,7 @@ export interface NewsItem {
   link: string
   pubDate: string
   contentSnippet?: string
+  source: 'WSJ' | 'FT'
 }
 
 const parser = new Parser()
@@ -28,6 +29,7 @@ export async function fetchWSJNews(): Promise<NewsItem[]> {
           link: item.link ?? '',
           pubDate: item.pubDate ?? '',
           contentSnippet: item.contentSnippet,
+          source: 'WSJ',
         })
       }
     }

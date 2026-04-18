@@ -6,6 +6,7 @@ export interface GameScore {
   status: string
   league: string
   highlight?: string
+  gameId: string
 }
 
 function yesterday(): string {
@@ -48,6 +49,7 @@ async function fetchLeague(sport: string, league: string, label: string): Promis
       status: comp.status?.type?.shortDetail ?? '',
       league: label,
       highlight: isSC ? 'SC' : isMets ? 'Mets' : undefined,
+      gameId: event.id ?? '',
     })
   }
   return games

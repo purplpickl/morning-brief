@@ -24,7 +24,7 @@ function formatDate() {
 }
 
 export default async function Home() {
-  const [stocks, news, ft, sports, gmail, scores] = await Promise.allSettled([
+  const [stocks, wsj, ft, sports, gmail, scores] = await Promise.allSettled([
     fetchStockQuotes(),
     fetchWSJNews(),
     fetchFTNews(),
@@ -34,11 +34,18 @@ export default async function Home() {
   ])
 
   const stockData = stocks.status === 'fulfilled' ? stocks.value : []
-  const newsData = news.status === 'fulfilled' ? news.value : []
-  const ftData = ft.status === 'fulfilled' ? ft.value : []
+  const wsjData  = wsj.status   === 'fulfilled' ? wsj.value   : []
+  const ftData   = ft.status    === 'fulfilled' ? ft.value    : []
   const sportsData = sports.status === 'fulfilled' ? sports.value : []
-  const gmailData = gmail.status === 'fulfilled' ? gmail.value : []
+  const gmailData  = gmail.status  === 'fulfilled' ? gmail.value  : []
   const scoresData = scores.status === 'fulfilled' ? scores.value : []
+
+  // Merge FT + WSJ, sort newest first
+  const newsData = [...ftData, ...wsjData].sort(
+    (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
+  )
+
+  const hasSports = sportsData.length > 0 || scoresData.length > 0
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -52,14 +59,8 @@ export default async function Home() {
 
         <QuickLinks />
 
-        {ftData.length > 0 && (
-          <CollapsibleSection title="Financial Times" badge={ftData.length}>
-            <NewsSection items={ftData} />
-          </CollapsibleSection>
-        )}
-
         {newsData.length > 0 && (
-          <CollapsibleSection title="Wall Street Journal" badge={newsData.length}>
+          <CollapsibleSection title="News" badge={newsData.length}>
             <NewsSection items={newsData} />
           </CollapsibleSection>
         )}
@@ -68,15 +69,16 @@ export default async function Home() {
           <GmailSection threads={gmailData} />
         </CollapsibleSection>
 
-        {scoresData.length > 0 && (
-          <CollapsibleSection title="Yesterday's Scores" badge={scoresData.length}>
-            <ScoresSection games={scoresData} />
-          </CollapsibleSection>
-        )}
-
-        {sportsData.length > 0 && (
-          <CollapsibleSection title="Sports" badge={sportsData.length}>
-            <SportsSection items={sportsData} />
+        {hasSports && (
+          <CollapsibleSection title="Sports" badge={sportsData.length || undefined}>
+            {scoresData.length > 0 && (
+              <div className="mb-4">
+                <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Yesterday&apos;s Scores</p>
+                <ScoresSection games={scoresData} />
+                {sportsData.length > 0 && <div className="border-t border-gray-800 mt-4" />}
+              </div>
+            )}
+            {sportsData.length > 0 && <SportsSection items={sportsData} />}
           </CollapsibleSection>
         )}
 
