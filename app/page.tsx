@@ -100,7 +100,7 @@ export default async function Home() {
               {formatDate()}
             </span>
             <span className="font-label text-[11px] tracking-[0.14em] uppercase text-muted">
-              Austin, TX
+              Raleigh, NC
             </span>
           </div>
 
