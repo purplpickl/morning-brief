@@ -33,9 +33,7 @@ export default function StocksSection({ stocks }: { stocks: StockQuote[] }) {
   ].filter(g => g.items.length > 0)
 
   return (
-    <section>
-      <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Stocks</h2>
-      <div className="space-y-4">
+    <div className="space-y-4">
         {groups.map(({ label, items }) => (
           <div key={label}>
             <p className="text-xs text-gray-500 mb-2">{label}</p>
@@ -69,7 +67,6 @@ export default function StocksSection({ stocks }: { stocks: StockQuote[] }) {
             </div>
           </div>
         ))}
-      </div>
-    </section>
+    </div>
   )
 }

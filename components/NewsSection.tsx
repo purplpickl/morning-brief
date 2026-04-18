@@ -10,13 +10,9 @@ function timeAgo(dateStr: string): string {
   return `${m}m ago`
 }
 
-export default function NewsSection({ items, title = 'Wall Street Journal' }: { items: NewsItem[], title?: string }) {
+export default function NewsSection({ items }: { items: NewsItem[] }) {
   return (
-    <section>
-      <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">
-        {title}
-      </h2>
-      <div className="space-y-2">
+    <div className="space-y-2">
         {items.map((item, i) => (
           <a
             key={i}
@@ -32,7 +28,6 @@ export default function NewsSection({ items, title = 'Wall Street Journal' }: { 
             <p className="text-gray-500 text-xs mt-1">{timeAgo(item.pubDate)}</p>
           </a>
         ))}
-      </div>
-    </section>
+    </div>
   )
 }

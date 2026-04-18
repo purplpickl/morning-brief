@@ -11,6 +11,7 @@ import GmailSection from '@/components/GmailSection'
 import QuickLinks from '@/components/QuickLinks'
 import WeatherSection from '@/components/WeatherSection'
 import ScoresSection from '@/components/ScoresSection'
+import CollapsibleSection from '@/components/CollapsibleSection'
 
 export const revalidate = 3600
 
@@ -51,17 +52,39 @@ export default async function Home() {
 
         <QuickLinks />
 
-        {ftData.length > 0 && <NewsSection items={ftData} title="Financial Times" />}
+        {ftData.length > 0 && (
+          <CollapsibleSection title="Financial Times" badge={ftData.length}>
+            <NewsSection items={ftData} />
+          </CollapsibleSection>
+        )}
 
-        {newsData.length > 0 && <NewsSection items={newsData} title="Wall Street Journal" />}
+        {newsData.length > 0 && (
+          <CollapsibleSection title="Wall Street Journal" badge={newsData.length}>
+            <NewsSection items={newsData} />
+          </CollapsibleSection>
+        )}
 
-        <GmailSection threads={gmailData} />
+        <CollapsibleSection title="Daily Reads" badge={gmailData.length || undefined}>
+          <GmailSection threads={gmailData} />
+        </CollapsibleSection>
 
-        <ScoresSection games={scoresData} />
+        {scoresData.length > 0 && (
+          <CollapsibleSection title="Yesterday's Scores" badge={scoresData.length}>
+            <ScoresSection games={scoresData} />
+          </CollapsibleSection>
+        )}
 
-        {sportsData.length > 0 && <SportsSection items={sportsData} />}
+        {sportsData.length > 0 && (
+          <CollapsibleSection title="Sports" badge={sportsData.length}>
+            <SportsSection items={sportsData} />
+          </CollapsibleSection>
+        )}
 
-        {stockData.length > 0 && <StocksSection stocks={stockData} />}
+        {stockData.length > 0 && (
+          <CollapsibleSection title="Stocks">
+            <StocksSection stocks={stockData} />
+          </CollapsibleSection>
+        )}
 
         <p className="text-center text-gray-600 text-xs pb-4">
           Refreshed daily at 6am ET

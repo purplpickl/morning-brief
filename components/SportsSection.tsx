@@ -12,11 +12,7 @@ function timeAgo(dateStr: string): string {
 
 export default function SportsSection({ items }: { items: SportsItem[] }) {
   return (
-    <section>
-      <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">
-        Sports — Last 24h
-      </h2>
-      <div className="space-y-2">
+    <div className="space-y-2">
         {items.length === 0 && (
           <p className="text-gray-500 text-sm">No sports news in the last 24 hours.</p>
         )}
@@ -38,7 +34,6 @@ export default function SportsSection({ items }: { items: SportsItem[] }) {
             <p className="text-gray-500 text-xs mt-1">{timeAgo(item.pubDate)}</p>
           </a>
         ))}
-      </div>
-    </section>
+    </div>
   )
 }

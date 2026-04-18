@@ -13,11 +13,7 @@ export default function ScoresSection({ games }: { games: GameScore[] }) {
   })).filter(g => g.games.length > 0)
 
   return (
-    <section>
-      <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">
-        Yesterday&apos;s Scores
-      </h2>
-      <div className="space-y-4">
+    <div className="space-y-4">
         {byLeague.map(({ league, games }) => (
           <div key={league}>
             <p className="text-xs text-gray-500 mb-2">{league}</p>
@@ -49,7 +45,6 @@ export default function ScoresSection({ games }: { games: GameScore[] }) {
             </div>
           </div>
         ))}
-      </div>
-    </section>
+    </div>
   )
 }
