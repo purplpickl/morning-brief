@@ -230,7 +230,7 @@ function LeagueScores({
 
   return (
     <div>
-      <p className="sub-head">{league}</p>
+      <p className="league-head">{league}</p>
       <div className="grid grid-cols-2 gap-1.5">
         {visible.map((game, i) => (
           <GameCard key={i} game={game} onClick={() => onSelect(game)} />
