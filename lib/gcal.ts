@@ -9,6 +9,23 @@ export interface CalEvent {
   color: string
 }
 
+function startOfDayET(daysOffset = 0): Date {
+  const now = new Date()
+  const etDate = now.toLocaleDateString('sv', { timeZone: 'America/New_York' })
+  const [y, m, d] = etDate.split('-').map(Number)
+  const base = new Date(Date.UTC(y, m - 1, d + daysOffset, 12, 0, 0))
+  const baseStr = base.toISOString().slice(0, 10)
+  const etHour = parseInt(
+    new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/New_York',
+      hour: '2-digit',
+      hour12: false,
+    }).format(base)
+  )
+  const offsetHours = 12 - etHour
+  return new Date(`${baseStr}T${String(offsetHours).padStart(2, '0')}:00:00Z`)
+}
+
 export async function fetchGoogleCalendar(): Promise<CalEvent[]> {
   const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN } = process.env
   if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !GOOGLE_REFRESH_TOKEN) return []
@@ -32,17 +49,12 @@ export async function fetchGoogleCalendar(): Promise<CalEvent[]> {
     const accessToken: string | undefined = tokenData.access_token
     if (!accessToken) return []
 
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const tomorrow = new Date(today)
-    tomorrow.setDate(tomorrow.getDate() + 1)
-
     const params = new URLSearchParams({
-      timeMin: today.toISOString(),
-      timeMax: tomorrow.toISOString(),
+      timeMin: startOfDayET(0).toISOString(),
+      timeMax: startOfDayET(2).toISOString(),
       singleEvents: 'true',
       orderBy: 'startTime',
-      maxResults: '12',
+      maxResults: '20',
     })
 
     const res = await fetch(

@@ -161,7 +161,7 @@ export default async function Home() {
             className="py-5 md:px-6 border-b md:border-b-0 md:border-r"
             style={{ borderColor: 'rgba(236,228,211,0.35)' }}
           >
-            <ColHead title="Today's Schedule" />
+            <ColHead title="Schedule" />
             <CalendarSection events={calEvents} />
           </div>
 

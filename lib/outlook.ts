@@ -1,5 +1,22 @@
 import { CalEvent } from './gcal'
 
+function startOfDayET(daysOffset = 0): Date {
+  const now = new Date()
+  const etDate = now.toLocaleDateString('sv', { timeZone: 'America/New_York' })
+  const [y, m, d] = etDate.split('-').map(Number)
+  const base = new Date(Date.UTC(y, m - 1, d + daysOffset, 12, 0, 0))
+  const baseStr = base.toISOString().slice(0, 10)
+  const etHour = parseInt(
+    new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/New_York',
+      hour: '2-digit',
+      hour12: false,
+    }).format(base)
+  )
+  const offsetHours = 12 - etHour
+  return new Date(`${baseStr}T${String(offsetHours).padStart(2, '0')}:00:00Z`)
+}
+
 export async function fetchOutlookCalendar(): Promise<CalEvent[]> {
   const { MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET, MICROSOFT_REFRESH_TOKEN } = process.env
   if (!MICROSOFT_CLIENT_ID || !MICROSOFT_CLIENT_SECRET || !MICROSOFT_REFRESH_TOKEN) return []
@@ -26,17 +43,12 @@ export async function fetchOutlookCalendar(): Promise<CalEvent[]> {
     const accessToken: string | undefined = tokenData.access_token
     if (!accessToken) return []
 
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const tomorrow = new Date(today)
-    tomorrow.setDate(tomorrow.getDate() + 1)
-
     const params = new URLSearchParams({
-      startDateTime: today.toISOString(),
-      endDateTime: tomorrow.toISOString(),
+      startDateTime: startOfDayET(0).toISOString(),
+      endDateTime: startOfDayET(2).toISOString(),
       $orderby: 'start/dateTime',
       $select: 'subject,start,end,location,isAllDay',
-      $top: '12',
+      $top: '20',
     })
 
     const res = await fetch(
