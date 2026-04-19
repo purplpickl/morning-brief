@@ -31,7 +31,7 @@ function formatDate(): string {
 function ColHead({ title }: { title: string }) {
   return (
     <div
-      className="flex items-center border-t border-b py-[5px] mb-4"
+      className="flex items-center border-b py-[5px] mb-4"
       style={{ borderColor: 'rgba(236,228,211,0.35)' }}
     >
       <h3 className="font-body-serif text-[20px] font-bold uppercase tracking-[0.08em] text-ink m-0">
