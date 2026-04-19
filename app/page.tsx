@@ -6,10 +6,13 @@ import { fetchDailyReads } from '@/lib/gmail'
 import { fetchYesterdayScores } from '@/lib/scores'
 import { fetchGoogleCalendar } from '@/lib/gcal'
 import { fetchOutlookCalendar } from '@/lib/outlook'
+import { fetchAINews, AINewsItem } from '@/lib/ainews'
+import { fetchPodcastEpisodes } from '@/lib/podcasts'
+import { GmailThread } from '@/lib/gmail'
 import StocksSection from '@/components/StocksSection'
 import NewsSection from '@/components/NewsSection'
 import SportsSection from '@/components/SportsSection'
-import GmailSection from '@/components/GmailSection'
+import AISection from '@/components/AISection'
 import QuickLinks from '@/components/QuickLinks'
 import WeatherSection from '@/components/WeatherSection'
 import LocationLabel from '@/components/LocationLabel'
@@ -50,8 +53,18 @@ function SectionHead({ title, meta }: { title: string; meta?: string }) {
   )
 }
 
+function gmailToAINewsItem(thread: GmailThread): AINewsItem {
+  return {
+    title: thread.subject,
+    link: `https://mail.google.com/mail/u/0/#inbox/${thread.id}`,
+    pubDate: thread.date,
+    contentSnippet: thread.snippet,
+    source: thread.from.replace(/"([^"]+)"/, '$1').replace(/<.*>/, '').trim(),
+  }
+}
+
 export default async function Home() {
-  const [stocks, wsj, ft, sports, gmail, scores, gcal, outlook] = await Promise.allSettled([
+  const [stocks, wsj, ft, sports, gmail, scores, gcal, outlook, aiNews, podcasts] = await Promise.allSettled([
     fetchStockQuotes(),
     fetchWSJNews(),
     fetchFTNews(),
@@ -60,6 +73,8 @@ export default async function Home() {
     fetchYesterdayScores(),
     fetchGoogleCalendar(),
     fetchOutlookCalendar(),
+    fetchAINews(),
+    fetchPodcastEpisodes(),
   ])
 
   const stockData   = stocks.status   === 'fulfilled' ? stocks.value   : []
@@ -70,8 +85,14 @@ export default async function Home() {
   const scoresData  = scores.status   === 'fulfilled' ? scores.value   : []
   const gcalData    = gcal.status     === 'fulfilled' ? gcal.value     : []
   const outlookData = outlook.status  === 'fulfilled' ? outlook.value  : []
+  const aiNewsData  = aiNews.status   === 'fulfilled' ? aiNews.value   : []
+  const podcastData = podcasts.status === 'fulfilled' ? podcasts.value : []
 
   const newsData = [...ftData, ...wsjData].sort(
+    (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
+  )
+
+  const techAIData = [...aiNewsData, ...gmailData.map(gmailToAINewsItem)].sort(
     (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
   )
 
@@ -80,6 +101,7 @@ export default async function Home() {
   )
 
   const hasSports = scoresData.length > 0 || sportsData.length > 0
+  const hasTechAI = techAIData.length > 0 || podcastData.length > 0
 
   return (
     <main className="min-h-screen bg-paper text-ink">
@@ -158,11 +180,11 @@ export default async function Home() {
           </>
         )}
 
-        {/* ── Daily Reads ───────────────────────────────────────────────── */}
-        {gmailData.length > 0 && (
+        {/* ── Tech & AI ─────────────────────────────────────────────────── */}
+        {hasTechAI && (
           <>
-            <SectionHead title="Daily Reads" meta={`${gmailData.length} newsletters`} />
-            <GmailSection threads={gmailData} />
+            <SectionHead title="Tech &amp; AI" />
+            <AISection items={techAIData} podcasts={podcastData} />
           </>
         )}
 
