@@ -54,6 +54,19 @@ html, body {
   letter-spacing: 0.08em;
 }
 
+/* Mid-level subhead — between section-head and col-label */
+.sub-head {
+  font-family: var(--font-body, 'Source Serif 4', Georgia, serif);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #ece4d3;
+  border-bottom: 1px solid rgba(236, 228, 211, 0.25);
+  padding-bottom: 5px;
+  margin-bottom: 12px;
+}
+
 /* Column subhead (inside a card column) */
 .col-label {
   font-family: var(--font-label, 'JetBrains Mono', monospace);

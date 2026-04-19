@@ -174,12 +174,12 @@ export default async function Home() {
               className={`grid gap-10 grid-cols-1 ${sportsData.length > 0 ? 'md:grid-cols-2' : ''}`}
             >
               <div>
-                <p className="col-label">Yesterday&apos;s Scores</p>
+                <p className="sub-head">Yesterday&apos;s Scores</p>
                 <ScoresSection games={scoresData} />
               </div>
               {sportsData.length > 0 && (
                 <div>
-                  <p className="col-label">Latest</p>
+                  <p className="sub-head">Latest</p>
                   <SportsSection items={sportsData} />
                 </div>
               )}

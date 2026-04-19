@@ -63,7 +63,7 @@ export default function StocksSection({ stocks }: { stocks: StockQuote[] }) {
           { label: 'Funds',    items: funds },
         ].filter(g => g.items.length > 0).map(({ label, items }) => (
           <div key={label} className="mb-6">
-            <p className="font-label text-[10px] text-muted tracking-wider uppercase mb-2">{label}</p>
+            <p className="sub-head">{label}</p>
             <div className="overflow-x-auto">
               <table className="w-full" style={{ borderCollapse: 'collapse', minWidth: '320px' }}>
                 <thead>
