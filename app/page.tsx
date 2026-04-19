@@ -201,7 +201,7 @@ export default async function Home() {
               </div>
               {sportsData.length > 0 && (
                 <div>
-                  <p className="sub-head">Latest</p>
+                  <p className="sub-head">Latest in Sports</p>
                   <SportsSection items={sportsData} />
                 </div>
               )}
