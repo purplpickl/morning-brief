@@ -17,35 +17,76 @@ export interface GameDetail {
   homeRecord?: string
   awayRecord?: string
   seriesSummary?: string
-  linescores: { label: string; home: number | string; away: number | string }[]
-  leaders: { team: 'home' | 'away'; name: string; stat: string; shortName: string }[]
-}
-
-const periodLabel = (leagueKey: string, i: number): string => {
-  if (leagueKey === 'MLB') return `${i + 1}`
-  if (leagueKey === 'NFL') return ['Q1', 'Q2', 'Q3', 'Q4', 'OT'][i] ?? `OT${i - 3}`
-  if (leagueKey === 'NBA') return ['Q1', 'Q2', 'Q3', 'Q4', 'OT'][i] ?? `OT${i - 3}`
-  if (leagueKey === 'NHL') return ['P1', 'P2', 'P3', 'OT'][i] ?? `OT${i - 2}`
-  return `${i + 1}`
+  notes: string[]
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function extractLinescores(homeComp: any, awayComp: any, leagueKey: string): GameDetail['linescores'] {
-  // ESPN puts linescores either on the competitor object directly or nested under linescores[]
-  const homeLs: { value: number }[] = homeComp?.linescores ?? []
-  const awayLs: { value: number }[] = awayComp?.linescores ?? []
-  const count = Math.max(homeLs.length, awayLs.length)
-  if (count === 0) return []
+function extractSeriesSummary(comp: any, comp2: any, data: any): string | undefined {
+  const isPostseason =
+    data.header?.season?.type?.id === '3' ||
+    data.header?.season?.type?.type === 3 ||
+    data.season?.type === 3
 
-  const result: GameDetail['linescores'] = []
-  for (let i = 0; i < count; i++) {
-    result.push({
-      label: periodLabel(leagueKey, i),
-      home: homeLs[i]?.value ?? '-',
-      away: awayLs[i]?.value ?? '-',
-    })
+  return (
+    comp?.series?.summary ??
+    comp2?.series?.summary ??
+    comp?.seriesSummary ??
+    (isPostseason ? (comp?.notes?.[0]?.headline ?? comp2?.notes?.[0]?.headline) : undefined)
+  )
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function buildNotes(data: any, homeComp: any, awayComp: any, homeScore: number, awayScore: number): string[] {
+  const playerStats = new Map<string, { teamAbbr: string; stats: string[] }>()
+
+  for (const group of (data.leaders ?? [])) {
+    const top = group.leaders?.[0]
+    if (!top) continue
+    const shortName: string = top.athlete?.shortName ?? top.athlete?.displayName ?? ''
+    if (!shortName || !top.displayValue) continue
+
+    const teamId: string = top.athlete?.team?.id ?? top.team?.id ?? ''
+    const homeId: string = homeComp?.team?.id ?? ''
+    const isHome = teamId && homeId ? teamId === homeId : false
+    const abbr: string = isHome
+      ? (homeComp?.team?.abbreviation ?? homeComp?.team?.shortDisplayName ?? '')
+      : (awayComp?.team?.abbreviation ?? awayComp?.team?.shortDisplayName ?? '')
+
+    if (!playerStats.has(shortName)) {
+      playerStats.set(shortName, { teamAbbr: abbr, stats: [] })
+    }
+    playerStats.get(shortName)!.stats.push(top.displayValue as string)
   }
-  return result
+
+  const notes: string[] = []
+  let playerCount = 0
+  for (const [name, { teamAbbr, stats }] of playerStats) {
+    if (playerCount >= 2) break
+    const label = teamAbbr ? `${name} (${teamAbbr})` : name
+    notes.push(`${label}: ${stats.join(', ')}`)
+    playerCount++
+  }
+
+  // Game context note
+  const diff = Math.abs(homeScore - awayScore)
+  const winnerComp = homeScore > awayScore ? homeComp : awayComp
+  const winner: string = winnerComp?.team?.shortDisplayName ?? winnerComp?.team?.displayName ?? ''
+  const statusDetail: string =
+    data.header?.competitions?.[0]?.status?.type?.shortDetail ?? ''
+  const isOT = /ot|overtime/i.test(statusDetail)
+  const extraInningsMatch = statusDetail.match(/Final\/(\d+)/)
+
+  if (isOT) {
+    notes.push(winner ? `${winner} pulled it out in overtime` : 'Went to overtime')
+  } else if (extraInningsMatch) {
+    notes.push(`Went ${extraInningsMatch[1]} innings`)
+  } else if (diff <= 3) {
+    notes.push(winner ? `${winner} held on — decided by ${diff}` : `Decided by ${diff}`)
+  } else if (diff >= 25) {
+    notes.push(winner ? `${winner} dominated — won by ${diff}` : `Dominant win by ${diff}`)
+  }
+
+  return notes.slice(0, 3)
 }
 
 export async function GET(req: NextRequest) {
@@ -66,65 +107,34 @@ export async function GET(req: NextRequest) {
   const res = await fetch(url, { next: { revalidate: 3600 } })
   if (!res.ok) return NextResponse.json({ error: 'ESPN fetch failed' }, { status: 502 })
 
-  const data = await res.json()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data: any = await res.json()
 
-  // Competitors: try header first, fall back to competitions[0]
   const comp = data.header?.competitions?.[0]
+  const comp2 = data.competitions?.[0]
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const competitors: any[] = comp?.competitors ?? []
-  const homeComp = competitors.find(c => c.homeAway === 'home')
-  const awayComp = competitors.find(c => c.homeAway === 'away')
-
-  // Fallback competitors with linescores from competitions[0]
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const comp2 = data.competitions?.[0]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const competitors2: any[] = comp2?.competitors ?? []
-  const homeComp2 = competitors2.find((c: { homeAway: string }) => c.homeAway === 'home')
-  const awayComp2 = competitors2.find((c: { homeAway: string }) => c.homeAway === 'away')
+
+  const homeComp = competitors.find(c => c.homeAway === 'home') ??
+                   competitors2.find(c => c.homeAway === 'home')
+  const awayComp = competitors.find(c => c.homeAway === 'away') ??
+                   competitors2.find(c => c.homeAway === 'away')
 
   const homeName: string = homeComp?.team?.shortDisplayName ?? homeComp?.team?.displayName ?? ''
   const awayName: string = awayComp?.team?.shortDisplayName ?? awayComp?.team?.displayName ?? ''
   const homeScore: number = parseInt(homeComp?.score ?? '0')
   const awayScore: number = parseInt(awayComp?.score ?? '0')
 
-  // Records: check both record[] and statistics[] paths ESPN uses
   const homeRecord: string | undefined =
-    homeComp?.record?.[0]?.summary ??
-    homeComp?.records?.[0]?.summary
+    homeComp?.record?.[0]?.summary ?? homeComp?.records?.[0]?.summary
   const awayRecord: string | undefined =
-    awayComp?.record?.[0]?.summary ??
-    awayComp?.records?.[0]?.summary
+    awayComp?.record?.[0]?.summary ?? awayComp?.records?.[0]?.summary
 
-  // Series summary: check multiple ESPN paths
-  const seriesSummary: string | undefined =
-    comp?.series?.summary ??
-    comp?.playoff?.seriesSummary ??
-    data.header?.season?.type?.name === 'Postseason' ? comp?.notes?.[0]?.headline : undefined
-
-  // Use whichever competitor source has linescores
-  const lsHome = (homeComp?.linescores?.length ? homeComp : homeComp2) ?? homeComp
-  const lsAway = (awayComp?.linescores?.length ? awayComp : awayComp2) ?? awayComp
-  const linescores = extractLinescores(lsHome, lsAway, leagueKey)
-
-  // Leaders: top performers from data.leaders[]
-  const leaders: GameDetail['leaders'] = []
-  for (const leaderGroup of data.leaders ?? []) {
-    for (const leader of leaderGroup.leaders ?? []) {
-      const athlete = leader.athlete
-      if (!athlete) continue
-      const teamId = athlete.team?.id ?? leader.team?.id
-      const homeTeamId = homeComp?.team?.id
-      leaders.push({
-        team: teamId === homeTeamId ? 'home' : 'away',
-        name: athlete.displayName ?? '',
-        shortName: athlete.shortName ?? athlete.displayName ?? '',
-        stat: leader.displayValue ?? '',
-      })
-      if (leaders.length >= 6) break
-    }
-    if (leaders.length >= 6) break
-  }
+  const seriesSummary = extractSeriesSummary(comp, comp2, data)
+  const notes = buildNotes(data, homeComp, awayComp, homeScore, awayScore)
 
   return NextResponse.json({
     homeName,
@@ -134,7 +144,6 @@ export async function GET(req: NextRequest) {
     homeRecord,
     awayRecord,
     seriesSummary,
-    linescores,
-    leaders,
+    notes,
   } satisfies GameDetail)
 }

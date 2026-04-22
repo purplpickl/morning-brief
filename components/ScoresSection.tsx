@@ -121,58 +121,17 @@ function GameSheet({ game, onClose }: { game: GameScore; onClose: () => void }) 
         )}
 
         {loading && (
-          <p className="font-label text-xs text-muted text-center py-4">Loading details...</p>
+          <p className="font-label text-xs text-muted text-center py-4">Loading...</p>
         )}
 
-        {detail && detail.linescores.length > 0 && (
-          <div className="px-4 py-3 mb-4 overflow-x-auto" style={{ border: '1px solid rgba(236,228,211,0.2)' }}>
-            <table className="w-full tabular-nums" style={{ borderCollapse: 'collapse', fontSize: '11px' }}>
-              <thead>
-                <tr>
-                  <th className="text-left font-normal pr-3 py-1 w-20 font-label text-muted" />
-                  {detail.linescores.map(ls => (
-                    <th key={ls.label} className="font-label text-muted font-normal text-center px-2 py-1 min-w-[2rem]">
-                      {ls.label}
-                    </th>
-                  ))}
-                  <th className="font-label text-ink font-semibold text-center px-2 py-1 min-w-[2rem]">T</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="font-label text-muted pr-3 py-1 truncate max-w-[5rem]">{detail.awayName || game.away}</td>
-                  {detail.linescores.map((ls, i) => (
-                    <td key={i} className="text-center px-2 py-1 text-ink/80">{ls.away}</td>
-                  ))}
-                  <td className={`text-center px-2 py-1 font-bold font-editorial ${awayWon ? 'text-ink' : 'text-muted'}`}>
-                    {game.awayScore}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="font-label text-muted pr-3 py-1 truncate max-w-[5rem]">{detail.homeName || game.home}</td>
-                  {detail.linescores.map((ls, i) => (
-                    <td key={i} className="text-center px-2 py-1 text-ink/80">{ls.home}</td>
-                  ))}
-                  <td className={`text-center px-2 py-1 font-bold font-editorial ${homeWon ? 'text-ink' : 'text-muted'}`}>
-                    {game.homeScore}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {detail && detail.leaders.length > 0 && (
-          <div className="px-4 py-3" style={{ border: '1px solid rgba(236,228,211,0.2)' }}>
-            <p className="font-label text-[10px] text-muted uppercase tracking-wider mb-2">Leaders</p>
-            <div className="space-y-1.5">
-              {detail.leaders.map((l, i) => (
-                <div key={i} className="flex justify-between">
-                  <span className="font-body-serif text-[13px] text-ink">{l.shortName}</span>
-                  <span className="font-label text-[11px] text-muted">{l.stat}</span>
-                </div>
-              ))}
-            </div>
+        {detail && detail.notes.length > 0 && (
+          <div className="space-y-2">
+            {detail.notes.map((note, i) => (
+              <div key={i} className="flex gap-2.5 items-start">
+                <span className="font-label text-[10px] text-muted mt-[3px] shrink-0">—</span>
+                <p className="font-body-serif text-[14px] text-ink leading-snug">{note}</p>
+              </div>
+            ))}
           </div>
         )}
       </div>
