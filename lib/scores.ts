@@ -7,7 +7,8 @@ export interface GameScore {
   league: string
   highlight?: string
   gameId: string
-  playoffNote?: string  // e.g. "Game 5", "Game 2" — only present during playoffs
+  playoffNote?: string
+  seriesSummary?: string  // e.g. "Celtics lead series 2-1"
 }
 
 function yesterday(): string {
@@ -70,6 +71,7 @@ async function fetchLeague(sport: string, league: string, label: string): Promis
       highlight: isSC ? 'SC' : isMets ? 'Mets' : undefined,
       gameId: event.id ?? '',
       playoffNote,
+      seriesSummary: isPlayoff ? (comp.series?.summary ?? undefined) : undefined,
     })
   }
   return games

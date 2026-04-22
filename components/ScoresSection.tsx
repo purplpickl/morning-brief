@@ -168,6 +168,11 @@ function GameCard({ game, onClick }: { game: GameScore; onClick: () => void }) {
         {isHighlight ? ` · ${game.highlight}` : ''}
         {game.playoffNote ? ` · ${game.playoffNote}` : ''}
       </p>
+      {game.seriesSummary && (
+        <p className="font-label text-[9px] mt-1 tracking-wider" style={{ color: '#93c5fd' }}>
+          {game.seriesSummary}
+        </p>
+      )}
     </button>
   )
 }
