@@ -44,7 +44,7 @@ async function fetchLeague(sport: string, league: string, label: string): Promis
     const isMets = metsTeams.some(t => allNames.some(n => n?.includes(t)))
 
     // Playoff game number — ESPN puts it in competition notes during postseason
-    const isPlayoff = event.season?.type?.id === '3' || event.season?.type?.type === 3
+    const isPlayoff = event.season?.type === 3
     let playoffNote: string | undefined
     if (isPlayoff) {
       const note = comp.notes?.find((n: { headline?: string }) =>
