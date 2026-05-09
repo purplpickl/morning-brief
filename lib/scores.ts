@@ -36,12 +36,14 @@ async function fetchLeague(sport: string, league: string, label: string): Promis
     const homeName = home.team?.shortDisplayName ?? home.team?.displayName ?? ''
     const awayName = away.team?.shortDisplayName ?? away.team?.displayName ?? ''
 
-    // Flag SC and Mets games
+    // Flag SC, Mets, and Knicks games
     const scTeams = ['South Carolina', 'Gamecocks']
     const metsTeams = ['Mets', 'New York Mets']
+    const knicksTeams = ['Knicks', 'New York Knicks']
     const allNames = [homeName, awayName, home.team?.displayName, away.team?.displayName]
     const isSC = scTeams.some(t => allNames.some(n => n?.includes(t)))
     const isMets = metsTeams.some(t => allNames.some(n => n?.includes(t)))
+    const isKnicks = knicksTeams.some(t => allNames.some(n => n?.includes(t)))
 
     // Playoff game number — ESPN puts it in competition notes during postseason
     const isPlayoff = event.season?.type === 3
@@ -68,7 +70,7 @@ async function fetchLeague(sport: string, league: string, label: string): Promis
       awayScore: parseInt(away.score ?? '0'),
       status: comp.status?.type?.shortDetail ?? '',
       league: label,
-      highlight: isSC ? 'SC' : isMets ? 'Mets' : undefined,
+      highlight: isSC ? 'SC' : isMets ? 'Mets' : isKnicks ? 'Knicks' : undefined,
       gameId: event.id ?? '',
       playoffNote,
       seriesSummary: isPlayoff ? (comp.series?.summary ?? undefined) : undefined,

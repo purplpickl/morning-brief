@@ -21,15 +21,7 @@ function fmtTime(iso: string, tz: string): string {
 }
 
 function pickBigGame(scores: GameScore[]): GameScore | null {
-  if (scores.length === 0) return null
-  const highlighted = scores.find(g => g.highlight)
-  if (highlighted) return highlighted
-  const priority = ['NBA', 'NHL', 'MLB', 'NFL', 'NCAAM']
-  for (const league of priority) {
-    const g = scores.find(s => s.league === league)
-    if (g) return g
-  }
-  return scores[0]
+  return scores.find(g => g.highlight) ?? null
 }
 
 function gameBlurb(game: GameScore): string {
@@ -67,7 +59,11 @@ export default function GreetingSection({
     })
   }, [])
 
-  const timedEvents = calEvents.filter(e => !e.allDay)
+  const todayStr = new Date().toLocaleDateString('sv', { timeZone: 'America/New_York' })
+  const timedEvents = calEvents.filter(e =>
+    !e.allDay &&
+    new Date(e.start).toLocaleDateString('sv', { timeZone: 'America/New_York' }) === todayStr
+  )
   const bigGame = pickBigGame(scores)
 
   const parts: string[] = []

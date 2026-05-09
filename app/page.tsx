@@ -1,9 +1,9 @@
 import { fetchStockQuotes } from '@/lib/stocks'
-import { fetchWSJNews } from '@/lib/wsj'
-import { fetchFTNews } from '@/lib/ft'
+import { fetchNews } from '@/lib/news'
 import { fetchSportsNews } from '@/lib/sports'
 import { fetchDailyReads } from '@/lib/gmail'
 import { fetchYesterdayScores } from '@/lib/scores'
+import { fetchTodayGames } from '@/lib/todaygames'
 import { fetchGoogleCalendar } from '@/lib/gcal'
 import { fetchOutlookCalendar } from '@/lib/outlook'
 import { fetchAINews, AINewsItem } from '@/lib/ainews'
@@ -13,6 +13,7 @@ import StocksSection from '@/components/StocksSection'
 import NewsSection from '@/components/NewsSection'
 import SportsSection from '@/components/SportsSection'
 import AISection from '@/components/AISection'
+import TodayGamesSection from '@/components/TodayGamesSection'
 import QuickLinks from '@/components/QuickLinks'
 import WeatherSection from '@/components/WeatherSection'
 import LocationLabel from '@/components/LocationLabel'
@@ -64,33 +65,29 @@ function gmailToAINewsItem(thread: GmailThread): AINewsItem {
 }
 
 export default async function Home() {
-  const [stocks, wsj, ft, sports, gmail, scores, gcal, outlook, aiNews, podcasts] = await Promise.allSettled([
+  const [stocks, news, sports, gmail, scores, todayGames, gcal, outlook, aiNews, podcasts] = await Promise.allSettled([
     fetchStockQuotes(),
-    fetchWSJNews(),
-    fetchFTNews(),
+    fetchNews(),
     fetchSportsNews(),
     fetchDailyReads(),
     fetchYesterdayScores(),
+    fetchTodayGames(),
     fetchGoogleCalendar(),
     fetchOutlookCalendar(),
     fetchAINews(),
     fetchPodcastEpisodes(),
   ])
 
-  const stockData   = stocks.status   === 'fulfilled' ? stocks.value   : []
-  const wsjData     = wsj.status      === 'fulfilled' ? wsj.value      : []
-  const ftData      = ft.status       === 'fulfilled' ? ft.value       : []
-  const sportsData  = sports.status   === 'fulfilled' ? sports.value   : []
-  const gmailData   = gmail.status    === 'fulfilled' ? gmail.value    : []
-  const scoresData  = scores.status   === 'fulfilled' ? scores.value   : []
-  const gcalData    = gcal.status     === 'fulfilled' ? gcal.value     : []
-  const outlookData = outlook.status  === 'fulfilled' ? outlook.value  : []
-  const aiNewsData  = aiNews.status   === 'fulfilled' ? aiNews.value   : []
-  const podcastData = podcasts.status === 'fulfilled' ? podcasts.value : []
-
-  const newsData = [...ftData, ...wsjData].sort(
-    (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
-  )
+  const stockData      = stocks.status     === 'fulfilled' ? stocks.value     : []
+  const newsData       = news.status       === 'fulfilled' ? news.value       : []
+  const sportsData     = sports.status     === 'fulfilled' ? sports.value     : []
+  const gmailData      = gmail.status      === 'fulfilled' ? gmail.value      : []
+  const scoresData     = scores.status     === 'fulfilled' ? scores.value     : []
+  const todayGamesData = todayGames.status === 'fulfilled' ? todayGames.value : []
+  const gcalData       = gcal.status       === 'fulfilled' ? gcal.value       : []
+  const outlookData    = outlook.status    === 'fulfilled' ? outlook.value    : []
+  const aiNewsData     = aiNews.status     === 'fulfilled' ? aiNews.value     : []
+  const podcastData    = podcasts.status   === 'fulfilled' ? podcasts.value   : []
 
   const techAIData = [...aiNewsData, ...gmailData.map(gmailToAINewsItem)].sort(
     (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
@@ -100,7 +97,7 @@ export default async function Home() {
     (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime()
   )
 
-  const hasSports = scoresData.length > 0 || sportsData.length > 0
+  const hasSports = scoresData.length > 0 || sportsData.length > 0 || todayGamesData.length > 0
   const hasTechAI = techAIData.length > 0 || podcastData.length > 0
 
   return (
@@ -115,7 +112,6 @@ export default async function Home() {
           className="text-center pt-8 pb-6"
           style={{ borderBottom: '1px solid rgba(236,228,211,0.35)' }}
         >
-          {/* Edition line */}
           <div className="flex justify-between items-center mb-4">
             <span className="font-label text-[11px] tracking-[0.14em] uppercase text-muted hidden md:inline">
               Morning Edition
@@ -130,7 +126,6 @@ export default async function Home() {
 
           <div style={{ borderTop: '1px solid rgba(236,228,211,0.35)', marginBottom: '16px' }} />
 
-          {/* Title */}
           <h1
             className="font-masthead leading-none tracking-tight"
             style={{ fontSize: 'clamp(52px, 8vw, 104px)' }}
@@ -147,7 +142,6 @@ export default async function Home() {
           className="grid grid-cols-1 md:grid-cols-3"
           style={{ borderBottom: '1px solid rgba(236,228,211,0.35)' }}
         >
-          {/* Weather */}
           <div
             className="py-5 md:pr-6 border-b md:border-b-0 md:border-r"
             style={{ borderColor: 'rgba(236,228,211,0.35)' }}
@@ -156,7 +150,6 @@ export default async function Home() {
             <WeatherSection />
           </div>
 
-          {/* Calendar */}
           <div
             className="py-5 md:px-6 border-b md:border-b-0 md:border-r"
             style={{ borderColor: 'rgba(236,228,211,0.35)' }}
@@ -165,7 +158,6 @@ export default async function Home() {
             <CalendarSection events={calEvents} />
           </div>
 
-          {/* Quick Links */}
           <div className="py-5 md:pl-6">
             <ColHead title="Quick Access" />
             <QuickLinks />
@@ -192,13 +184,25 @@ export default async function Home() {
         {hasSports && (
           <>
             <SectionHead title="Sports" />
+
+            {/* Today's Games */}
+            {todayGamesData.length > 0 && (
+              <div className="mb-8">
+                <p className="sub-head">Today&apos;s Games</p>
+                <TodayGamesSection games={todayGamesData} />
+              </div>
+            )}
+
+            {/* Yesterday's Scores + Latest in Sports */}
             <div
               className={`grid gap-10 grid-cols-1 ${sportsData.length > 0 ? 'md:grid-cols-2' : ''}`}
             >
-              <div>
-                <p className="sub-head">Yesterday&apos;s Scores</p>
-                <ScoresSection games={scoresData} />
-              </div>
+              {scoresData.length > 0 && (
+                <div>
+                  <p className="sub-head">Yesterday&apos;s Scores</p>
+                  <ScoresSection games={scoresData} />
+                </div>
+              )}
               {sportsData.length > 0 && (
                 <div>
                   <p className="sub-head">Latest in Sports</p>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { NewsItem } from '@/lib/wsj'
+import { NewsItem } from '@/lib/news'
 
 const DEFAULT_SECONDARY = 3
 
@@ -51,7 +51,7 @@ export default function NewsSection({ items }: { items: NewsItem[] }) {
             {lead.contentSnippet}
           </p>
         )}
-        <span className="font-label text-[10px] text-muted/70">{timeAgo(lead.pubDate)}</span>
+        <span className="font-label text-[10px] text-muted/70">{lead.source} · {timeAgo(lead.pubDate)}</span>
       </div>
 
       {/* Secondary articles */}
@@ -73,7 +73,7 @@ export default function NewsSection({ items }: { items: NewsItem[] }) {
                   {item.contentSnippet}
                 </p>
               )}
-              <span className="font-label text-[10px] text-muted/60">{timeAgo(item.pubDate)}</span>
+              <span className="font-label text-[10px] text-muted/60">{item.source} · {timeAgo(item.pubDate)}</span>
             </div>
           ))}
         </div>
